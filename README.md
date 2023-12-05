@@ -1,1 +1,1 @@
-# Furest-Fury-Battle-of-the-Little-Warrior
+# Forest Fury: Battle of the Little Warrior
