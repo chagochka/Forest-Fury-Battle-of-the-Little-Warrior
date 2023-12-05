@@ -182,30 +182,30 @@ window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption('fight!')
 
 
-player_model = pygame.image.load('ninja.gif')
+player_model = pygame.image.load('images/ninja.gif')
 
 monster_textures = {
-    'low': pygame.image.load('slither.gif'),
-    'medium': pygame.image.load('spider.gif'),
-    'high': pygame.image.load('knight.gif'),
-    'boss': pygame.image.load('boss.gif')
+    'low': pygame.image.load('images/slither.gif'),
+    'medium': pygame.image.load('images/spider.gif'),
+    'high': pygame.image.load('images/knight.gif'),
+    'boss': pygame.image.load('images/boss.gif')
 }
 
 monster = monster_textures[monsters.diff]
-background = pygame.image.load('background.jpg')
-menu = pygame.image.load('game_menu.jpg')
+background = pygame.image.load('images/background.jpg')
+menu = pygame.image.load('images/game_menu.jpg')
 
-boots = {'common': 'common_boots.gif', 'uncommon': 'uncommon_boots.gif',
-         'rare': 'rare_boots.gif', 'mythical': 'mythical_boots.gif', 'legendary': 'legendary_boots.gif'}
-trousers = {'common': 'common_trousers.gif', 'uncommon': 'uncommon_trousers.gif',
-            'rare': 'rare_trousers.gif', 'mythical': 'mythical_trousers.gif', 'legendary': 'legendary_trousers.gif'}
-breastplate = {'common': 'common_breastplate.gif', 'uncommon': 'uncommon_breastplate.gif',
-               'rare': 'rare_breastplate.gif', 'mythical': 'mythical_breastplate.gif',
-               'legendary': 'legendary_breastplate.gif'}
-helmet = {'common': 'common_helmet.gif', 'uncommon': 'uncommon_helmet.gif',
-          'rare': 'rare_helmet.gif', 'mythical': 'mythical_helmet.gif', 'legendary': 'legendary_helmet.gif'}
-sword = {'common': 'common_sword.gif', 'uncommon': 'uncommon_sword.gif',
-         'rare': 'rare_sword.gif', 'mythical': 'mythical_sword.gif', 'legendary': 'legendary_sword.gif'}
+boots = {'common': 'images/common_boots.gif', 'uncommon': 'images/uncommon_boots.gif',
+         'rare': 'images/rare_boots.gif', 'mythical': 'images/mythical_boots.gif', 'legendary': 'images/legendary_boots.gif'}
+trousers = {'common': 'images/common_trousers.gif', 'uncommon': 'images/uncommon_trousers.gif',
+            'rare': 'images/rare_trousers.gif', 'mythical': 'images/mythical_trousers.gif', 'legendary': 'images/legendary_trousers.gif'}
+breastplate = {'common': 'images/common_breastplate.gif', 'uncommon': 'images/uncommon_breastplate.gif',
+               'rare': 'images/rare_breastplate.gif', 'mythical': 'images/mythical_breastplate.gif',
+               'legendary': 'images/legendary_breastplate.gif'}
+helmet = {'common': 'images/common_helmet.gif', 'uncommon': 'images/uncommon_helmet.gif',
+          'rare': 'images/rare_helmet.gif', 'mythical': 'images/mythical_helmet.gif', 'legendary': 'images/legendary_helmet.gif'}
+sword = {'common': 'images/common_sword.gif', 'uncommon': 'images/uncommon_sword.gif',
+         'rare': 'images/rare_sword.gif', 'mythical': 'images/mythical_sword.gif', 'legendary': 'images/legendary_sword.gif'}
 
 inGame = False
 
