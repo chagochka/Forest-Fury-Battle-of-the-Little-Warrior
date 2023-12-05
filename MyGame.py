@@ -1,5 +1,6 @@
 import random
 import pygame
+from pygame import transform
 
 
 class Monster:
@@ -32,6 +33,7 @@ class Monster:
         self.atk = self.monster_statistics[self.diff][0]
         self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][-1])
         self.speed = self.monster_statistics[self.diff][-1]
+        self.right = True
 
     def is_life(self):  # проверка живой ли монстр, если нет то выпадает дроп
         if self.hp <= 0:
@@ -47,8 +49,10 @@ class Monster:
             if player.x != int(self.x):
                 if player.x > self.x:
                     self.x += self.speed
+                    self.right = True
                 else:
                     self.x -= self.speed
+                    self.right = False
             if player.y != int(self.y):
                 if player.y > self.y:
                     self.y += self.speed
@@ -134,6 +138,7 @@ class Player:
         self.timer = 0
         self.score = 0
         self.healing = 500
+        self.right = True
 
     def damage_taken(self, damage):
         self.health -= damage / 100 * (100 - item.armor_protection())  # получение урона
@@ -151,10 +156,12 @@ class Player:
     def move_left(self):  # Движение игрока по карте
         if self.x - 1 >= 0 and self.health > 0:
             self.x -= 1
+            self.right = False
 
     def move_right(self):  # Движение игрока по карте
         if self.x + 1 <= 1160 and self.health > 0:
             self.x += 1
+            self.right = True
 
     def move_down(self):  # Движение игрока по карте
         if self.y + 1 <= 610 and self.health > 0:
@@ -182,7 +189,8 @@ window = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption('fight!')
 
 
-player_model = pygame.image.load('images/ninja.gif')
+player_model_right = pygame.image.load('images/ninja.gif')
+player_model_left = transform.flip(player_model_right, True, False)  # герой смотрящий влево
 
 monster_textures = {
     'low': pygame.image.load('images/slither.gif'),
@@ -191,21 +199,26 @@ monster_textures = {
     'boss': pygame.image.load('images/boss.gif')
 }
 
-monster = monster_textures[monsters.diff]
+monster_model_right = monster_textures[monsters.diff]
+monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
 
 boots = {'common': 'images/common_boots.gif', 'uncommon': 'images/uncommon_boots.gif',
-         'rare': 'images/rare_boots.gif', 'mythical': 'images/mythical_boots.gif', 'legendary': 'images/legendary_boots.gif'}
+         'rare': 'images/rare_boots.gif', 'mythical': 'images/mythical_boots.gif',
+         'legendary': 'images/legendary_boots.gif'}
 trousers = {'common': 'images/common_trousers.gif', 'uncommon': 'images/uncommon_trousers.gif',
-            'rare': 'images/rare_trousers.gif', 'mythical': 'images/mythical_trousers.gif', 'legendary': 'images/legendary_trousers.gif'}
+            'rare': 'images/rare_trousers.gif', 'mythical': 'images/mythical_trousers.gif', 'legendary':
+                'images/legendary_trousers.gif'}
 breastplate = {'common': 'images/common_breastplate.gif', 'uncommon': 'images/uncommon_breastplate.gif',
                'rare': 'images/rare_breastplate.gif', 'mythical': 'images/mythical_breastplate.gif',
                'legendary': 'images/legendary_breastplate.gif'}
 helmet = {'common': 'images/common_helmet.gif', 'uncommon': 'images/uncommon_helmet.gif',
-          'rare': 'images/rare_helmet.gif', 'mythical': 'images/mythical_helmet.gif', 'legendary': 'images/legendary_helmet.gif'}
+          'rare': 'images/rare_helmet.gif', 'mythical': 'images/mythical_helmet.gif',
+          'legendary': 'images/legendary_helmet.gif'}
 sword = {'common': 'images/common_sword.gif', 'uncommon': 'images/uncommon_sword.gif',
-         'rare': 'images/rare_sword.gif', 'mythical': 'images/mythical_sword.gif', 'legendary': 'images/legendary_sword.gif'}
+         'rare': 'images/rare_sword.gif', 'mythical': 'images/mythical_sword.gif',
+         'legendary': 'images/legendary_sword.gif'}
 
 inGame = False
 
@@ -259,8 +272,9 @@ while run:
                 player.healing -= 1
 
         window.blit(background, (0, 0))  # фон, монстр, игрок
-        window.blit(monster, (monsters.x, monsters.y))
-        window.blit(player_model, (player.x, player.y))
+        window.blit(monster_model_right if monsters.right else monster_model_left, (monsters.x, monsters.y))
+        window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
+        # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
         if item.inventory_rarities['helmet']:  # показ снаряжения в правом верхнем углу экрана
             window.blit(pygame.image.load(helmet[item.inventory_rarities['helmet']]), (1192, 0))
