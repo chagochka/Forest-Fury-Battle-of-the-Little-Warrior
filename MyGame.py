@@ -4,6 +4,9 @@ from pygame import transform
 
 
 class Monster:
+    """
+    Класс монстра
+    """
     def __init__(self):
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
@@ -35,7 +38,11 @@ class Monster:
         self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
 
-    def is_life(self):  # проверка живой ли монстр, если нет то выпадает дроп
+    def is_life(self):
+        """
+        Проверка живой ли монстр, если нет то выпадает дроп
+        :return: bool
+        """
         if self.hp <= 0:
             item.drop_weapon(self.diff)
             if player.score <= 2000:
@@ -44,7 +51,11 @@ class Monster:
             return False
         return True
 
-    def monster_move(self):  # движение монстра по карте(авт)
+    def monster_move(self):
+        """
+        Движение монстра по карте (автоматически)
+        :return: None
+        """
         if self.hp > 0:
             if player.x != int(self.x):
                 if player.x > self.x:
@@ -59,13 +70,20 @@ class Monster:
                 else:
                     self.y -= self.speed
 
-    def attack(self):  # атака по игроку(авт)
+    def attack(self):
+        """
+         Атака по игроку (автоматически) + кд
+         :return None
+        """
         if player.attack_range() and self.hp > 0 >= self.timer:
             player.damage_taken(self.atk)
             self.timer = 500
 
 
 class Items:
+    """
+    Класс предмет
+    """
     def __init__(self):
         self.inventory_rarities = {
             'sword': '',
@@ -92,7 +110,11 @@ class Items:
             'helmet': 0
         }
 
-    def weapon_stats(self):  # (автоматическая)
+    def weapon_stats(self):
+        """
+        Функция рандомно выбирает тип редкость и статистику предмета
+        :return: None
+        """
         rarity = random.choices(self.rarities, weights=[5, 4, 3, 2, 1], k=1)[0]  # редкость дропа
         weapon = random.choices(self.weapon, weights=[8, 9, 9, 10, 9], k=1)[0]  # тип оружия/брони
         # (шанс на аксессуар удален)
@@ -103,16 +125,30 @@ class Items:
             self.inventory_rarities[weapon] = rarity
 
     def armor_protection(self):  # определяет общий процент защиты от брони
+        """
+        Возвращает текущий процент защиты от брони
+        :return: int
+        """
         p1 = self.stats['boots']
         p2 = self.stats['trousers']
         p3 = self.stats['breastplate']
         p4 = self.stats['helmet']
         return sum([p1, p2, p3, p4])
 
-    def sword_damage(self):  # Автоматически выбирает меч с наилучшим показателем урона
+    def sword_damage(self):
+        """
+        Возвращает текущий урон от меча
+        :return: int
+        """
         return self.stats['sword']
 
     def drop_weapon(self, diff):
+        """
+        Функция проверяет сложность побежденного монстра и если сложность босс - то дает в инвентарь игроку случайный
+        легендарный дроп иначе - с 30% шансом вызывает функцию для получения любого дропа (даже хуже имеющегося)
+        :param diff: Str - сложность убитого монстра
+        :return: None
+        """
         if diff == 'boss':  # если игрок убивает босса тоь дропается лег шмотка
             rarity = 'legendary'
             weapon = random.choices(self.weapon, weights=[8, 9, 9, 10, 9], k=1)[0]
@@ -130,6 +166,9 @@ class Items:
 
 
 class Player:
+    """
+    Класс игрока
+    """
     def __init__(self):
         self.health = 500
         self.attack = 50
@@ -141,9 +180,18 @@ class Player:
         self.right = True
 
     def damage_taken(self, damage):
+        """
+        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60%)
+        :param damage: int
+        :return: None
+        """
         self.health -= damage / 100 * (100 - item.armor_protection())  # получение урона
 
     def damage_given(self):  # Нанесение урона мобу
+        """
+        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча)
+        :return: None
+        """
         if self.attack_range():
             if monsters.hp > 0 >= player.timer and self.health >= 0:
                 monsters.hp -= self.attack + item.sword_damage()
@@ -151,23 +199,43 @@ class Player:
                 player.timer = 300
 
     def attack_range(self):  # радиус атаки
+        """
+        Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
+        :return: bool
+        """
         return -128 <= self.x - monsters.x <= 128 and -128 <= self.y - monsters.y <= 128
 
     def move_left(self):  # Движение игрока по карте
+        """
+        Перемещает персонажа по оси Х влево
+        :return: None
+        """
         if self.x - 1 >= 0 and self.health > 0:
             self.x -= 1
             self.right = False
 
     def move_right(self):  # Движение игрока по карте
+        """
+        Перемещает персонажа по оси Х вправо
+        :return: None
+        """
         if self.x + 1 <= 1160 and self.health > 0:
             self.x += 1
             self.right = True
 
     def move_down(self):  # Движение игрока по карте
+        """
+        Перемещает персонажа по оси У вниз
+        :return: None
+        """
         if self.y + 1 <= 610 and self.health > 0:
             self.y += 1
 
     def move_up(self):  # Движение игрока по карте
+        """
+        Перемещает персонажа по оси У вверх
+        :return: None
+        """
         if self.health > 0:
             if self.y - 1 >= 0:
                 self.y -= 1
@@ -176,12 +244,6 @@ class Player:
 item = Items()
 player = Player()
 monsters = Monster()
-
-# item.inventory.append(('sword', 'Ultra-Legend', 500))  # очень мощное оружие
-# item.inventory.append(('breastplate', 'Ultra-Legend', 25))
-# item.inventory.append(('boots', 'Ultra-Legend', 15))
-# item.inventory.append(('helmet', 'Ultra-Legend', 15))
-# item.inventory.append(('trousers', 'Ultra-Legend', 20))
 
 
 pygame.init()
