@@ -71,14 +71,13 @@ class Items:
             'helmet': ''
         }
         self.rarities = ['common', 'uncommon', 'rare', 'mythical', 'legendary']  # редкости снаряжения
-        self.weapon = ['sword', 'boots', 'trousers', 'breastplate', 'helmet']  # типы снаряжения (accessory deleted)
+        self.weapon = ['sword', 'boots', 'trousers', 'breastplate', 'helmet']  # типы снаряжения
         self.weapons = {
             'sword': [(100, 120), (120, 150), (150, 170), (170, 200), (200, 250)],  # статистика снаряжения по редкости
             'boots': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
             'trousers': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
             'breastplate': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
             'helmet': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
-            # 'accessory': [(100, 150), (150, 200), (200, 250), (250, 300), (300, 350)]
         }
         self.stats = {
             'sword': 0,
@@ -88,15 +87,23 @@ class Items:
             'helmet': 0
         }
 
-    def weapon_stats(self):  # (автоматическая)
+    def weapon_stats(self):
+        self.x = monsters.x
+        self.y = monsters.y
+        self.timer = 300
         rarity = random.choices(self.rarities, weights=[5, 4, 3, 2, 1], k=1)[0]  # редкость дропа
         weapon = random.choices(self.weapon, weights=[8, 9, 9, 10, 9], k=1)[0]  # тип оружия/брони
-        # (шанс на аксессуар удален)
         statistic = random.randint(self.weapons[weapon][self.rarities.index(rarity)][0],
                                    self.weapons[weapon][self.rarities.index(rarity)][1])  # статистика урон защита и тд
-        if self.stats[weapon] < statistic:
-            self.stats[weapon] = statistic
-            self.inventory_rarities[weapon] = rarity
+        if self.stats[weapon] < statistic and self.in_range() and self.timer > 0:
+            self.statistic_up(weapon, statistic, rarity)
+
+    def statistic_up(self, items, statistic, rarity):
+        self.stats[items] = statistic
+        self.inventory_rarities[items] = rarity
+
+    def in_range(self):
+        return -64 <= self.x - player.x <= 64 and -64 <= self.y - player.y <= 64
 
     def armor_protection(self):  # определяет общий процент защиты от брони
         p1 = self.stats['boots']
@@ -105,11 +112,11 @@ class Items:
         p4 = self.stats['helmet']
         return sum([p1, p2, p3, p4])
 
-    def sword_damage(self):  # Автоматически выбирает меч с наилучшим показателем урона
+    def sword_damage(self):  # возвращает урон от меча
         return self.stats['sword']
 
     def drop_weapon(self, diff):
-        if diff == 'boss':  # если игрок убивает босса тоь дропается лег шмотка
+        if diff == 'boss':  # если игрок убивает босса - то дропается лег шмотка
             rarity = 'legendary'
             weapon = random.choices(self.weapon, weights=[8, 9, 9, 10, 9], k=1)[0]
             statistic = random.randint(self.weapons[weapon][self.rarities.index(rarity)][0],
@@ -122,7 +129,7 @@ class Items:
         else:
             a = random.choices([True, False], weights=[2, 1], k=1)[0]  # определяется выпадет ли дроп
             if a:
-                item.weapon_stats()  # выбор характеристик дропа
+                self.weapon_stats()  # выбор характеристик дропа
 
 
 class Player:
@@ -169,12 +176,6 @@ class Player:
 item = Items()
 player = Player()
 monsters = Monster()
-
-# item.inventory.append(('sword', 'Ultra-Legend', 500))  # очень мощное оружие
-# item.inventory.append(('breastplate', 'Ultra-Legend', 25))
-# item.inventory.append(('boots', 'Ultra-Legend', 15))
-# item.inventory.append(('helmet', 'Ultra-Legend', 15))
-# item.inventory.append(('trousers', 'Ultra-Legend', 20))
 
 
 pygame.init()
