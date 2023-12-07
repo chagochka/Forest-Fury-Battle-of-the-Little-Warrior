@@ -311,7 +311,7 @@ def monster_dead():
     :return: None
     """
     global monsters, monster_model_right, monster_model_left, monster_textures
-    if not monsters.is_life() and monsters.timer <= 0:
+    if monsters.hp <= 0 and monsters.timer <= 0:
         del monsters
         monsters = Monster()
         monster_model_right = monster_textures[monsters.diff]
