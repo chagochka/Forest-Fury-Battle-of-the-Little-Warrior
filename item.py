@@ -5,6 +5,7 @@ class Item():
 	"""
 	Класс предмет
 	"""
+
 	def __init__(self, image, rarity, type):
 		self.image = image
 		self.rarity = rarity
@@ -24,11 +25,11 @@ class Weapon(Item):
 	def __init__(self, image, rarity, type):
 		super().__init__(image, rarity, type)
 		damages = {
-            'common': 100,
-            'rare': 150,
-            'epic': 250,
-            'legendary': 400,
-        }
+			'common': 100,
+			'rare': 150,
+			'epic': 250,
+			'legendary': 400,
+		}
 		self.image = image
 		self.rarity = rarity
 		self.type = type
@@ -47,3 +48,4 @@ class Armor(Item):
 		self.image = image
 		self.rarity = rarity
 		self.type = type
+		self.defense = defenses[self.rarity]
