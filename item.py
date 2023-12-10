@@ -1,6 +1,3 @@
-import pygame as pg
-
-
 class Item():
 	"""
 	Класс предмет
@@ -11,41 +8,46 @@ class Item():
 		self.rarity = rarity
 		self.type = type
 
-	def drop_weapon(self, diff, pos):
+	def drop(self, window, pos):
 		"""
 		Функция проверяет сложность побежденного монстра и если сложность босс - то дает в инвентарь игроку случайный
 		легендарный дроп иначе - с 30% шансом вызывает функцию для получения любого дропа (даже хуже имеющегося)
+		:param window:
+		:param pos:
 		:param diff: Str - сложность убитого монстра
 		:return: None
 		"""
-		pass
+		window.blit(self.image, pos)
 
 
 class Weapon(Item):
+	damages = {
+		'common': 100,
+		'uncommon': 150,
+		'mythical': 250,
+		'legendary': 400,
+	}
+
 	def __init__(self, image, rarity, type):
 		super().__init__(image, rarity, type)
-		damages = {
-			'common': 100,
-			'rare': 150,
-			'epic': 250,
-			'legendary': 400,
-		}
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.damage = damages[self.rarity]
+		self.damage = self.damages[self.rarity]
 
 
 class Armor(Item):
+	defenses = {
+		'common': 100,
+		'uncommon': 150,
+		'mythical': 250,
+		'legendary': 400,
+	}
+
 	def __init__(self, image, rarity, type):
 		super().__init__(image, rarity, type)
-		defenses = {
-			'common': 100,
-			'rare': 150,
-			'epic': 250,
-			'legendary': 400,
-		}
+
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.defense = defenses[self.rarity]
+		self.defense = self.defenses[self.rarity]
