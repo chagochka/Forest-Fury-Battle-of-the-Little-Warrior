@@ -21,11 +21,11 @@ class Item():
 
 
 class Weapon(Item):
-	damages = {
+	stats = {
 		'common': 100,
 		'uncommon': 150,
-		'mythical': 250,
-		'legendary': 400,
+		'mythical': 200,
+		'legendary': 300,
 	}
 
 	def __init__(self, image, rarity, type):
@@ -33,21 +33,20 @@ class Weapon(Item):
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.damage = self.damages[self.rarity]
+		self.damage = self.stats[self.rarity]
 
 
 class Armor(Item):
-	defenses = {
+	stats = {
 		'common': 100,
 		'uncommon': 150,
-		'mythical': 250,
-		'legendary': 400,
+		'mythical': 200,
+		'legendary': 300,
 	}
 
 	def __init__(self, image, rarity, type):
 		super().__init__(image, rarity, type)
-
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.defense = self.defenses[self.rarity]
+		self.defense = self.stats[self.rarity]

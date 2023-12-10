@@ -3,7 +3,7 @@ import random
 import pygame
 from pygame import transform
 
-from item import Weapon
+from item import Weapon, Armor
 
 
 class Monster:
@@ -48,7 +48,7 @@ class Monster:
 		:return: bool
 		"""
 		if self.hp <= 0:
-			rar = random.choices(list(Weapon.damages.keys()), weights=[0.4, 0.3, 0.2, 0.1] if self.diff != 'boss' else [0, 0, 0, 1])
+			rar = random.choices(list(Weapon.stats.keys()), weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])
 			items.append((Weapon(pygame.image.load(f'images/{rar[0]}_sword.gif'), rar[0], 'sword'),
 			              (self.x, self.y), cycle))
 			if player.score <= 2000:
@@ -93,7 +93,7 @@ class Player:
 
 	def __init__(self):
 		self.health = 500
-		self.attack = 200
+		self.attack = 50
 		self.x = 580
 		self.y = 305
 		self.timer = 0
@@ -123,7 +123,7 @@ class Player:
 		"""
 		if self.attack_range():
 			if monsters.hp > 0 >= player.timer and self.health >= 0:
-				monsters.hp -= self.attack
+				monsters.hp -= self.attack + (self.inventory['sword'].damage if self.inventory['sword'] else 0)
 				monsters.is_life()
 				player.timer = 300
 
