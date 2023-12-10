@@ -1,16 +1,12 @@
 import pygame as pg
 
 
-class Item(pg.sprite.Sprite):
+class Item():
 	"""
 	Класс предмет
 	"""
-
-	def __init__(self, group_sprites, pos, image, rarity, item_class):
-		super().__init__(group_sprites)
+	def __init__(self, pos, image, rarity, item_class):
 		self.image = image
-		self.rect = self.image.get_rect()
-		self.rect.x, self.rect.y = pos
 		self.rarity = rarity
 		self.item_class = item_class
 
@@ -25,22 +21,18 @@ class Item(pg.sprite.Sprite):
 
 
 class Weapon(Item):
-	def __init__(self, group_sprites, pos, image, rarity, item_class, damage):
-		super().__init__(group_sprites, pos, image, rarity, item_class)
+	def __init__(self, pos, image, rarity, item_class, damage):
+		super().__init__(pos, image, rarity, item_class)
 		self.image = image
-		self.rect = self.image.get_rect()
-		self.rect.x, self.rect.y = pos
 		self.rarity = rarity
 		self.item_class = item_class
 		self.damage = damage
 
 
 class Armor(Item):
-	def __init__(self, group_sprites, pos, image, rarity, item_class, defense):
-		super().__init__(group_sprites, pos, image, rarity, item_class)
+	def __init__(self, pos, image, rarity, item_class, defense):
+		super().__init__(pos, image, rarity, item_class)
 		self.image = image
-		self.rect = self.image.get_rect()
-		self.rect.x, self.rect.y = pos
 		self.rarity = rarity
 		self.item_class = item_class
 		self.defense = defense
