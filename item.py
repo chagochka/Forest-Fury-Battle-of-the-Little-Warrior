@@ -6,13 +6,13 @@ class Item(pg.sprite.Sprite):
 	Класс предмет
 	"""
 
-	def __init__(self, group_sprites, pos, image, rarity, type):
+	def __init__(self, group_sprites, pos, image, rarity, item_class):
 		super().__init__(group_sprites)
 		self.image = image
 		self.rect = self.image.get_rect()
 		self.rect.x, self.rect.y = pos
 		self.rarity = rarity
-		self.type = type
+		self.item_class = item_class
 
 	# self.inventory_rarities = {
 	#     'sword': '',
