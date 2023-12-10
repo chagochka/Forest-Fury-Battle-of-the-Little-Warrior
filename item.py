@@ -33,7 +33,7 @@ class Weapon(Item):
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.damage = self.stats[self.rarity]
+		self.stat = self.damage = self.stats[self.rarity]
 
 
 class Armor(Item):
@@ -49,4 +49,4 @@ class Armor(Item):
 		self.image = image
 		self.rarity = rarity
 		self.type = type
-		self.defense = self.stats[self.rarity]
+		self.stat = self.defense = self.stats[self.rarity]

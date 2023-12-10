@@ -48,9 +48,17 @@ class Monster:
 		:return: bool
 		"""
 		if self.hp <= 0:
-			rar = random.choices(list(Weapon.stats.keys()), weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])
-			items.append((Weapon(pygame.image.load(f'images/{rar[0]}_sword.gif'), rar[0], 'sword'),
-			              (self.x, self.y), cycle))
+			item_type = random.choice([Weapon, Armor])
+			rar = random.choices(list(item_type.stats.keys()),
+			                     weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])[0]
+			if item_type == Weapon:
+				items.append((Weapon(pygame.image.load(f'images/{rar}_sword.gif'), rar, 'sword'),
+				              (self.x, self.y), cycle))
+			else:
+				armor_type = random.choices(['boots', 'trousers', 'helmet', 'breastplate'],
+				                            weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])[0]
+				items.append((Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
+				              (self.x, self.y), cycle))
 			if player.score <= 2000:
 				player.health += 50
 			player.score += self.scores[self.diff]
@@ -102,10 +110,10 @@ class Player:
 		self.right = True
 		self.inventory = {
 			'sword': '',
-			'boots': '',
-			'trousers': '',
+			'helmet': '',
 			'breastplate': '',
-			'helmet': ''
+			'trousers': '',
+			'boots': ''
 		}
 
 	def damage_taken(self, damage):
@@ -114,7 +122,7 @@ class Player:
 		:param damage: int
 		:return: None
 		"""
-		self.health -= damage / 100 * (100)  # получение урона
+		self.health -= damage / 100 * (100 - (sum([armor.defense for armor in list(self.inventory.values())[1:] if armor])))  # получение урона
 
 	def damage_given(self):  # Нанесение урона мобу
 		"""
@@ -170,7 +178,6 @@ class Player:
 				self.y -= 1
 
 
-# item = Items()
 player = Player()
 monsters = Monster()
 
@@ -262,6 +269,17 @@ while run:
 				player.healing -= 1
 
 		window.blit(background, (0, 0))  # фон, монстр, игрок
+
+		for dropped_item, pos, drop_cycle in items:
+			dropped_item.drop(window, pos)
+			if cycle - drop_cycle == 1000:
+				items.pop(items.index((dropped_item, pos, drop_cycle)))
+			if (player.x - pos[0] <= 50 or pos[0] - player.x <= 50) and (player.y - pos[1] <= 50 or pos[
+				1] - player.y <= 50) and (not player.inventory[
+				dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat):
+				player.inventory[dropped_item.type] = dropped_item
+				items.pop(items.index((dropped_item, pos, drop_cycle)))
+
 		window.blit(monster_model_right if monsters.right else monster_model_left, (monsters.x, monsters.y))
 		window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
 		# загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
@@ -289,16 +307,6 @@ while run:
 		monster_hp = Font.render('Monster: ' + (str(monsters.hp) + 'hp' if monsters.hp > 0 else 'Dead'),
 		                         False, (0, 0, 0), (0, 150, 100))
 		window.blit(monster_hp, (0, 685))
-
-		for dropped_item, pos, drop_cycle in items:
-			dropped_item.drop(window, pos)
-			if cycle - drop_cycle == 1000:
-				items.pop(items.index((dropped_item, pos, drop_cycle)))
-			if (player.x - pos[0] <= 50 or pos[0] - player.x <= 50) and (player.y - pos[1] <= 50 or pos[
-				1] - player.y <= 50) and (not player.inventory[
-				dropped_item.type] or dropped_item.damage > player.inventory[dropped_item.type].damage):
-				player.inventory[dropped_item.type] = dropped_item
-				items.pop(items.index((dropped_item, pos, drop_cycle)))
 
 	else:
 		window.blit(menu, (0, 0))  # меню игры, кнопки и тд
