@@ -5,7 +5,7 @@ class Item():
 	"""
 	Класс предмет
 	"""
-	def __init__(self, pos, image, rarity, item_class):
+	def __init__(self, image, rarity, item_class):
 		self.image = image
 		self.rarity = rarity
 		self.item_class = item_class
@@ -21,8 +21,8 @@ class Item():
 
 
 class Weapon(Item):
-	def __init__(self, pos, image, rarity, item_class, damage):
-		super().__init__(pos, image, rarity, item_class)
+	def __init__(self, image, rarity, item_class, damage):
+		super().__init__(image, rarity, item_class)
 		self.image = image
 		self.rarity = rarity
 		self.item_class = item_class
@@ -30,8 +30,8 @@ class Weapon(Item):
 
 
 class Armor(Item):
-	def __init__(self, pos, image, rarity, item_class, defense):
-		super().__init__(pos, image, rarity, item_class)
+	def __init__(self, image, rarity, item_class, defense):
+		super().__init__(image, rarity, item_class)
 		self.image = image
 		self.rarity = rarity
 		self.item_class = item_class
