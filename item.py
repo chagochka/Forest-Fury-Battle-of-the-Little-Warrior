@@ -5,10 +5,10 @@ class Item():
 	"""
 	Класс предмет
 	"""
-	def __init__(self, image, rarity, item_class):
+	def __init__(self, image, rarity, type):
 		self.image = image
 		self.rarity = rarity
-		self.item_class = item_class
+		self.type = type
 
 	def drop_weapon(self, diff, pos):
 		"""
@@ -21,18 +21,29 @@ class Item():
 
 
 class Weapon(Item):
-	def __init__(self, image, rarity, item_class, damage):
-		super().__init__(image, rarity, item_class)
+	def __init__(self, image, rarity, type):
+		super().__init__(image, rarity, type)
+		damages = {
+            'common': 100,
+            'rare': 150,
+            'epic': 250,
+            'legendary': 400,
+        }
 		self.image = image
 		self.rarity = rarity
-		self.item_class = item_class
-		self.damage = damage
+		self.type = type
+		self.damage = damages[self.rarity]
 
 
 class Armor(Item):
-	def __init__(self, image, rarity, item_class, defense):
-		super().__init__(image, rarity, item_class)
+	def __init__(self, image, rarity, type):
+		super().__init__(image, rarity, type)
+		defenses = {
+			'common': 100,
+			'rare': 150,
+			'epic': 250,
+			'legendary': 400,
+		}
 		self.image = image
 		self.rarity = rarity
-		self.item_class = item_class
-		self.defense = defense
+		self.type = type
