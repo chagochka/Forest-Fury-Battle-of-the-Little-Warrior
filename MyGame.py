@@ -303,16 +303,27 @@ def set_items():
     Показывает модельки предметов в верхнем левом углу экрана
     :return: None
     """
+    font = pygame.font.SysFont(None, 40)
+
     if player.inventory_rarities['helmet']:  # показ снаряжения в правом верхнем углу экрана
         window.blit(pygame.image.load(helmet[player.inventory_rarities['helmet']]), (width - 64, 0))
+        window.blit(font.render(str(player.stats['helmet']), True, 'white'), (width - 64, 64 - 24))
+
     if player.inventory_rarities['breastplate']:
         window.blit(pygame.image.load(breastplate[player.inventory_rarities['breastplate']]), (width - 64, 64))
+        window.blit(font.render(str(player.stats['breastplate']), True, 'white'), (width - 64, 128 - 24))
+
     if player.inventory_rarities['trousers']:
         window.blit(pygame.image.load(trousers[player.inventory_rarities['trousers']]), (width - 64, 128))
+        window.blit(font.render(str(player.stats['trousers']), True, 'white'), (width - 64, 192 - 24))
+
     if player.inventory_rarities['boots']:
         window.blit(pygame.image.load(boots[player.inventory_rarities['boots']]), (width - 64, 192))
+        window.blit(font.render(str(player.stats['boots']), True, 'white'), (width - 64, 256 - 24))
+
     if player.inventory_rarities['sword']:
         window.blit(pygame.image.load(sword[player.inventory_rarities['sword']]), (width - 64, 256))
+        window.blit(font.render(str(player.stats['sword']), True, 'white'), (width - 64, 320 - 24))
 
 
 def set_text():
@@ -387,15 +398,23 @@ def inventory_draw():
     Рисует ячейки инвентаря и их содержимое
     :return: None
     """
+    font = pygame.font.SysFont(None, 40)
+
     window.blit(inventory_cell, (width // 2 - 96, height - 64))
     window.blit(inventory_cell, (width // 2 - 32, height - 64))
     window.blit(inventory_cell, (width // 2 + 32, height - 64))
     if player.items_inventory[0]:
         window.blit(potion_inventory, (width // 2 - 96, height - 64))
+        window.blit(font.render(str(player.items_inventory[0]), True, (200, 200, 200)),
+                    (width // 2 - 96 + 48, height - 64 + 32))
     if player.items_inventory[1]:
         window.blit(potion_inventory, (width // 2 - 32, height - 64))
+        window.blit(font.render(str(player.items_inventory[1]), True, (200, 200, 200)),
+                    (width // 2 - 32 + 48, height - 64 + 32))
     if player.items_inventory[2]:
         window.blit(potion_inventory, (width // 2 + 32, height - 64))
+        window.blit(font.render(str(player.items_inventory[2]), True, (200, 200, 200)),
+                    (width // 2 + 32 + 48, height - 64 + 32))
 
 
 width, height = 1280, 720
