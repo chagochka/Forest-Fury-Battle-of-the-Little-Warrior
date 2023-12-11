@@ -122,7 +122,8 @@ class Player:
 		:param damage: int
 		:return: None
 		"""
-		self.health -= damage / 100 * (100 - (sum([armor.defense for armor in list(self.inventory.values())[1:] if armor])))  # получение урона
+		self.health -= damage / 100 * (
+				100 - (sum([armor.defense for armor in list(self.inventory.values())[1:] if armor])))  # получение урона
 
 	def damage_given(self):  # Нанесение урона мобу
 		"""
@@ -177,6 +178,9 @@ class Player:
 			if self.y - 1 >= 0:
 				self.y -= 1
 
+	def move(self, key):
+		pass
+
 
 player = Player()
 monsters = Monster()
@@ -228,7 +232,6 @@ while run:
 	key = pygame.key.get_pressed()
 
 	if inGame:
-
 		if key[pygame.K_d] and player.x < 1160:  # движение героя
 			player.move_right()
 		if key[pygame.K_s] and player.y < 610:
@@ -274,8 +277,7 @@ while run:
 			dropped_item.drop(window, pos)
 			if cycle - drop_cycle == 1000:
 				items.pop(items.index((dropped_item, pos, drop_cycle)))
-			if (player.x - pos[0] <= 50 or pos[0] - player.x <= 50) and (player.y - pos[1] <= 50 or pos[
-				1] - player.y <= 50) and (not player.inventory[
+			if abs(player.x - pos[0]) <= 50 and abs(player.y - pos[1] <= 50) and (not player.inventory[
 				dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat):
 				player.inventory[dropped_item.type] = dropped_item
 				items.pop(items.index((dropped_item, pos, drop_cycle)))
