@@ -4,9 +4,7 @@ from pygame import transform
 
 
 class Monster:
-    """
-    Класс монстра
-    """
+    """Класс монстра"""
 
     def __init__(self):
         self.difficulty = ['low', 'medium', 'high', 'boss']
@@ -46,8 +44,6 @@ class Monster:
         """
         if self.hp <= 0:
             item.drop_weapon(self.diff, monsters.get_cords())
-            if player.score <= 2000:
-                player.health += 50
             player.score += self.scores[self.diff]
             return False
         return True
@@ -85,9 +81,7 @@ class Monster:
 
 
 class ItemsStats:
-    """
-    Класс предмет
-    """
+    """Класс предмет"""
 
     def __init__(self):
         self.rarities = ['common', 'uncommon', 'rare', 'mythical', 'legendary']  # редкости снаряжения
@@ -133,26 +127,23 @@ class ItemsStats:
                 self.weapons[self.dropped_weapon][self.rarities.index(self.dropped_rarity)][0],
                 self.weapons[self.dropped_weapon][self.rarities.index(self.dropped_rarity)][1])
             self.cords = monster_cords
-            if random.choices([True, False], weights=[1, 2], k=1)[0] and player.score < 5000:
-                player.healing += 30
         else:
             if random.choices([True, False], weights=[2, 1], k=1)[0]:  # определяется выпадет ли дроп
                 self.weapon_stats(monsters.get_cords())  # выбор характеристик дропа
 
 
 class Player:
-    """
-    Класс игрока
-    """
+    """Класс игрока"""
+
     def __init__(self):
         self.health = 500
         self.attack = 50
-        self.x = 580
-        self.y = 305
+        self.x = width // 2 - 64
+        self.y = height // 2 - 64
         self.timer = 0
         self.score = 0
-        self.healing = 500
         self.right = True
+        self.items_inventory = [0, 0, 0]
         self.stats = {
             'sword': 0,
             'boots': 0,
@@ -167,8 +158,20 @@ class Player:
             'breastplate': '',
             'helmet': ''
         }
+        self.heals = {
+            50: 0,
+            75: 1,
+            100: 2
+        }
 
     def find_item(self, x, y):
+        """
+        Возвращает True/False в зависимости от того находится ли персонаж рядом с зельем
+        (расстояние, для того чтобы подобрать предмет)
+        :param x: int
+        :param y: int
+        :return: bool
+        """
         return -64 <= self.x - x <= 64 and -64 <= self.y - y <= 64
 
     def damage_taken(self, damage):
@@ -230,7 +233,7 @@ class Player:
         Перемещает персонажа по оси Х вправо
         :return: None
         """
-        if self.x + 1 <= 1160 and self.health > 0:
+        if self.x + 1 <= width - 128 and self.health > 0:
             self.x += 1
             self.right = True
 
@@ -239,7 +242,7 @@ class Player:
         Перемещает персонажа по оси У вниз
         :return: None
         """
-        if self.y + 1 <= 610 and self.health > 0:
+        if self.y + 1 <= height - 128 and self.health > 0:
             self.y += 1
 
     def move_up(self):  # Движение игрока по карте
@@ -251,6 +254,49 @@ class Player:
             if self.y - 1 >= 0:
                 self.y -= 1
 
+    def find_heal(self, heal_value):
+        self.items_inventory[self.heals[heal_value]] += 1
+
+
+class HealingBottle:
+    """Класс зелья здоровья"""
+
+    def __init__(self):
+        self.timer = 0
+        self.created = False
+
+    def is_created(self):
+        """
+        Возвращает True/False в зависимости от того выпало ли зелье
+        :return: bool
+        """
+        return self.created
+
+    def drop(self, x, y):
+        """
+        Устанавливает координаты и рандомно выбирает количество лечения
+        :param x: int
+        :param y: int
+        :return: None
+        """
+        self.created = True
+        self.cords = (x, y)
+        self.heal = random.choices([50, 75, 100], weights=[5, 3, 1], k=1)[0]
+
+    def use_heal(self):
+        """
+        Устанавливает таймер на использование
+        :return: None
+        """
+        self.timer = 300
+
+    def can_use(self):
+        """
+        Возвращает True/False в зависимости от того можно ли использовать зелье
+        :return:
+        """
+        return self.timer <= 0
+
 
 def set_items():
     """
@@ -258,15 +304,15 @@ def set_items():
     :return: None
     """
     if player.inventory_rarities['helmet']:  # показ снаряжения в правом верхнем углу экрана
-        window.blit(pygame.image.load(helmet[player.inventory_rarities['helmet']]), (1192, 0))
+        window.blit(pygame.image.load(helmet[player.inventory_rarities['helmet']]), (width - 64, 0))
     if player.inventory_rarities['breastplate']:
-        window.blit(pygame.image.load(breastplate[player.inventory_rarities['breastplate']]), (1192, 64))
+        window.blit(pygame.image.load(breastplate[player.inventory_rarities['breastplate']]), (width - 64, 64))
     if player.inventory_rarities['trousers']:
-        window.blit(pygame.image.load(trousers[player.inventory_rarities['trousers']]), (1192, 128))
+        window.blit(pygame.image.load(trousers[player.inventory_rarities['trousers']]), (width - 64, 128))
     if player.inventory_rarities['boots']:
-        window.blit(pygame.image.load(boots[player.inventory_rarities['boots']]), (1192, 192))
+        window.blit(pygame.image.load(boots[player.inventory_rarities['boots']]), (width - 64, 192))
     if player.inventory_rarities['sword']:
-        window.blit(pygame.image.load(sword[player.inventory_rarities['sword']]), (1192, 256))
+        window.blit(pygame.image.load(sword[player.inventory_rarities['sword']]), (width - 64, 256))
 
 
 def set_text():
@@ -281,9 +327,6 @@ def set_text():
 
     heat = font.render('Ready to heat: ' + str(player.timer <= 0), False, (0, 0, 0), (200, 100, 100))
     window.blit(heat, (0, 33))
-
-    heal_point = font.render('Heal: ' + str(player.healing), False, (0, 0, 0), (0, 150, 100))
-    window.blit(heal_point, (0, 66))
 
     score = font.render('Score: ' + str(player.score), False, (0, 0, 0), (200, 200, 0))
     window.blit(score, (580, 0))
@@ -303,6 +346,7 @@ def every_update():
     monsters.attack()
     monsters.timer -= 1
     player.timer -= 1
+    bottle.timer -= 1
 
 
 def monster_dead():
@@ -312,6 +356,7 @@ def monster_dead():
     """
     global monsters, monster_model_right, monster_model_left, monster_textures
     if monsters.hp <= 0 and monsters.timer <= 0:
+        bottle.drop(*monsters.get_cords())
         del monsters
         monsters = Monster()
         monster_model_right = monster_textures[monsters.diff]
@@ -327,6 +372,8 @@ def draw_models():
     try:
         if item:
             window.blit(pygame.image.load(type_items[item.dropped_weapon][item.dropped_rarity]), item.cords)
+        if bottle.is_created():
+            window.blit(potion_model, bottle.cords)
     except KeyError:  # загружаем модельку выпавшего оружия на землю (не подобранное)
         pass  # не тестил без try
 
@@ -335,13 +382,31 @@ def draw_models():
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
 
+def inventory_draw():
+    """
+    Рисует ячейки инвентаря и их содержимое
+    :return: None
+    """
+    window.blit(inventory_cell, (width // 2 - 96, height - 64))
+    window.blit(inventory_cell, (width // 2 - 32, height - 64))
+    window.blit(inventory_cell, (width // 2 + 32, height - 64))
+    if player.items_inventory[0]:
+        window.blit(potion_inventory, (width // 2 - 96, height - 64))
+    if player.items_inventory[1]:
+        window.blit(potion_inventory, (width // 2 - 32, height - 64))
+    if player.items_inventory[2]:
+        window.blit(potion_inventory, (width // 2 + 32, height - 64))
+
+
+width, height = 1280, 720
+
 item = ItemsStats()
 player = Player()
 monsters = Monster()
-
+bottle = HealingBottle()
 
 pygame.init()
-window = pygame.display.set_mode((1280, 720))
+window = pygame.display.set_mode((width, height))
 pygame.display.set_caption('fight!')
 
 player_model_right = pygame.image.load('images/ninja.gif')
@@ -358,6 +423,9 @@ monster_model_right = monster_textures[monsters.diff]
 monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
+potion_model = pygame.image.load('images/potion.gif')
+potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
+inventory_cell = pygame.image.load('images/inventory.gif')
 
 boots = {'common': 'images/common_boots.gif', 'uncommon': 'images/uncommon_boots.gif',
          'rare': 'images/rare_boots.gif', 'mythical': 'images/mythical_boots.gif',
@@ -387,17 +455,16 @@ while run:
     key = pygame.key.get_pressed()
 
     if inGame:
-
-        if key[pygame.K_d] and player.x < 1160:  # движение героя
+        if key[pygame.K_d]:  # движение героя
             player.move_right()
 
-        if key[pygame.K_s] and player.y < 610:
+        if key[pygame.K_s]:
             player.move_down()
 
-        if key[pygame.K_a] and player.x >= 0:
+        if key[pygame.K_a]:
             player.move_left()
 
-        if key[pygame.K_w] and player.y >= 0:
+        if key[pygame.K_w]:
             player.move_up()
 
         if key[pygame.K_e]:
@@ -413,6 +480,9 @@ while run:
                         player.stats[item.dropped_weapon] = item.dropped_statistic
                         player.inventory_rarities[item.dropped_weapon] = item.dropped_rarity
                         item = ItemsStats()
+                if player.find_item(*bottle.cords):
+                    player.find_heal(bottle.heal)
+                    bottle = HealingBottle()  # пересоздаем ботл чтобы нельзя было собрать больше одного раза
             except TypeError:  # Пока что не тестил без try. Просто чтобы не крашило
                 pass
             except AttributeError:
@@ -426,14 +496,28 @@ while run:
         if key[pygame.K_i] and player.timer <= 0:  # информация про выпавший предмет в консоль
             print(player.inventory_rarities, player.stats)
             print(item.dropped_statistic, item.dropped_weapon, item.dropped_rarity, item.cords)
+            print(player.items_inventory)
 
         if key[pygame.K_ESCAPE]:  # меню
             inGame = False
 
-        if key[pygame.K_h]:  # хил
-            if player.healing > 0 and player.health > 0:
-                player.health += 1
-                player.healing -= 1
+        if key[pygame.K_1]:
+            if bottle.can_use() and player.items_inventory[0] and player.health > 0:
+                player.health += 50
+                player.items_inventory[0] -= 1
+                bottle.use_heal()
+
+        if key[pygame.K_2]:
+            if bottle.can_use() and player.items_inventory[1] and player.health > 0:
+                player.health += 75
+                player.items_inventory[1] -= 1
+                bottle.use_heal()
+
+        if key[pygame.K_3]:
+            if bottle.can_use() and player.items_inventory[2] and player.health > 0:
+                player.health += 100
+                player.items_inventory[2] -= 1
+                bottle.use_heal()
 
         window.blit(background, (0, 0))  # фон, монстр, игрок
 
@@ -446,6 +530,8 @@ while run:
         set_text()  # устанавливает хп, хп монстра, перезарядку оружия и тд
 
         every_update()  # делает ход монстра и уменьшает таймеры
+
+        inventory_draw()  # рисует инвентарь
 
     else:
         window.blit(menu, (0, 0))  # меню игры, кнопки и тд
