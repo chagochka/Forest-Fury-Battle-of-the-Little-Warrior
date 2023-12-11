@@ -230,8 +230,11 @@ while run:
 			run = False
 
 	key = pygame.key.get_pressed()
+	mouse = pygame.mouse.get_pressed(5)
 
 	if inGame:
+		pygame.mouse.set_visible(False)
+
 		if key[pygame.K_d] and player.x < 1160:  # движение героя
 			player.move_right()
 		if key[pygame.K_s] and player.y < 610:
@@ -240,7 +243,7 @@ while run:
 			player.move_left()
 		if key[pygame.K_w] and player.y >= 0:
 			player.move_up()
-		if key[pygame.K_e]:
+		if key[pygame.K_e] or mouse[0]:
 			player.damage_given()
 		if key[pygame.K_t]:
 			print(monsters.timer)
@@ -266,7 +269,7 @@ while run:
 		if key[pygame.K_ESCAPE]:
 			inGame = False
 
-		if key[pygame.K_h]:
+		if key[pygame.K_h] or mouse[4]:
 			if player.healing > 0 and player.health > 0:
 				player.health += 1
 				player.healing -= 1
@@ -311,6 +314,7 @@ while run:
 		window.blit(monster_hp, (0, 685))
 
 	else:
+		pygame.mouse.set_visible(True)
 		window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
 		if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
