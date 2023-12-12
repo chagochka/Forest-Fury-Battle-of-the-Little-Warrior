@@ -26,12 +26,8 @@ class Monster:
 			'high': 150,
 			'boss': 200
 		}
-
-		while True:
-			self.x = random.randint(0, 1160)
-			self.y = random.randint(0, 610)
-			if (self.x, self.y) != (5, 5):
-				break
+		self.x = random.randint(0, 1160)
+		self.y = random.randint(0, 610)
 
 		if player.score <= 2000:
 			self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
