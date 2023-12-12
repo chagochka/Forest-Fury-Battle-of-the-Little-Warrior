@@ -221,6 +221,7 @@ inGame = False
 items = []
 run = True
 cycle = 0
+font = pygame.font.SysFont(None, 25)
 while run:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -286,10 +287,11 @@ while run:
 		window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
 		# загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-		y = 0
+		y = 64
 		for item in player.inventory.values():
 			if item:
-				window.blit(item.image, (1192, y))
+				window.blit(item.image, (1192, y - 64))
+				window.blit(font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
 			y += 64
 
 		Font = pygame.font.SysFont('timesnewroman', 30)  # отображает на экране хп и тд
