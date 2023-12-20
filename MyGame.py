@@ -41,7 +41,7 @@ class Monster:
         :return: bool
         """
         if self.hp <= 0:
-            item_type = random.choices([Weapon, Armor], weights=[1, 4])
+            item_type = random.choices([Weapon, Armor], weights=[1, 4])[0]
             rar = random.choices(Item.rarities, weights=[5, 4, 3, 2, 1])[0]
             if self.diff == 'boss':
                 rar = 'legendary'
@@ -81,7 +81,7 @@ class Monster:
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if player.attack_range() and self.hp > 0 >= self.timer:
+        if player.attack_range() and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
 
@@ -99,6 +99,7 @@ class Player:
         self.timer = 0
         self.score = 0
         self.right = True
+        self.immortality = False
         self.inventory = {
             'sword': '',
             'helmet': '',
@@ -106,6 +107,7 @@ class Player:
             'trousers': '',
             'boots': ''
         }
+        self.items_inventory = [0, 0, 0]
 
     def damage_taken(self, damage):
         """
@@ -113,8 +115,10 @@ class Player:
         :param damage: int
         :return: None
         """
-        self.health -= damage / 100 * (  # ?
-                100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))  # получение урона
+        if not self.immortality:
+            self.health -= damage / 100 * (  # ?
+                    100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))
+            # получение урона
 
     def damage_given(self):  # Нанесение урона мобу
         """
@@ -123,7 +127,10 @@ class Player:
         """
         if self.attack_range():
             if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
-                monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                if not self.immortality:
+                    monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                else:
+                    monsters.hp -= 500
                 monsters.is_life()
                 player.timer = 300
 
@@ -227,6 +234,30 @@ def write_stats():
     window.blit(monster_hp, (0, 685))
 
 
+def inventory_draw():
+    """
+    Рисует ячейки инвентаря и их содержимое
+    :return: None
+    """
+    font = pygame.font.SysFont(None, 40)
+
+    window.blit(inventory_cell, (width // 2 - 96, height - 64))
+    window.blit(inventory_cell, (width // 2 - 32, height - 64))
+    window.blit(inventory_cell, (width // 2 + 32, height - 64))
+    if player.items_inventory[0]:
+        window.blit(potion_inventory, (width // 2 - 96, height - 64))
+        window.blit(font.render(str(player.items_inventory[0]), True, (200, 200, 200)),
+                    (width // 2 - 96 + 48, height - 64 + 32))
+    if player.items_inventory[1]:
+        window.blit(potion_inventory, (width // 2 - 32, height - 64))
+        window.blit(font.render(str(player.items_inventory[1]), True, (200, 200, 200)),
+                    (width // 2 - 32 + 48, height - 64 + 32))
+    if player.items_inventory[2]:
+        window.blit(potion_inventory, (width // 2 + 32, height - 64))
+        window.blit(font.render(str(player.items_inventory[2]), True, (200, 200, 200)),
+                    (width // 2 + 32 + 48, height - 64 + 32))
+
+
 width, height = 1280, 720
 
 player = Player()
@@ -251,6 +282,9 @@ monster_model_right = monster_textures[monsters.diff]
 monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
+potion_model = pygame.image.load('images/potion.gif')
+potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
+inventory_cell = pygame.image.load('images/inventory.gif')
 
 inGame = False
 items = []
@@ -281,13 +315,18 @@ while run:
             player.damage_given()
         if key[pygame.K_t]:
             print(monsters.timer)
+        if key[pygame.K_j]:
+            player.immortality = True
 
         monsters.monster_move()
         monsters.attack()
         monsters.timer -= 1
         player.timer -= 1
+        bottle.timer -= 1
 
         if monsters.hp <= 0 and monsters.timer <= 0:
+            bottle.drop(monsters.x, monsters.y)  # нужно сделать геттер
+            print('kill')
             del monsters
             monsters = Monster()
             monster = monster_textures[monsters.diff]
@@ -298,7 +337,8 @@ while run:
             print('monster info:', monsters.diff)
 
         if key[pygame.K_i]:
-            print(items[0])
+            print(player.items_inventory)
+            # print(items[0])
 
         if key[pygame.K_ESCAPE]:
             inGame = False
@@ -308,10 +348,29 @@ while run:
                 if player.find_item(*bottle.cords):
                     player.find_heal(bottle.heal)
                     bottle = HealingBottle()  # пересоздаем ботл чтобы нельзя было собрать больше одного раза
+                    print('drop')
             except TypeError:  # Пока что не тестил без try. Просто чтобы не крашило
                 pass
             except AttributeError:
                 pass
+
+        if key[pygame.K_1]:
+            if bottle.can_use() and player.items_inventory[0] and player.health > 0:
+                player.health += 50
+                player.items_inventory[0] -= 1
+                bottle.use_heal()
+
+        if key[pygame.K_2]:
+            if bottle.can_use() and player.items_inventory[1] and player.health > 0:
+                player.health += 75
+                player.items_inventory[1] -= 1
+                bottle.use_heal()
+
+        if key[pygame.K_3]:
+            if bottle.can_use() and player.items_inventory[2] and player.health > 0:
+                player.health += 100
+                player.items_inventory[2] -= 1
+                bottle.use_heal()
 
         window.blit(background, (0, 0))  # фон, монстр, игрок
 
@@ -335,6 +394,8 @@ while run:
 
         items_draw()
 
+        inventory_draw()
+
         write_stats()
 
         clock.tick(300)
@@ -353,6 +414,5 @@ while run:
     pygame.display.update()
 
 pygame.quit()
-
 
 """не загружается другая картинка моба"""
