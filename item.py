@@ -1,52 +1,86 @@
-class Item():
-	"""
-	Класс предмет
-	"""
+import random
 
-	def __init__(self, image, rarity, type):
-		self.image = image
-		self.rarity = rarity
-		self.type = type
 
-	def drop(self, window, pos):
-		"""
-		Функция проверяет сложность побежденного монстра и если сложность босс - то дает в инвентарь игроку случайный
-		легендарный дроп иначе - с 30% шансом вызывает функцию для получения любого дропа (даже хуже имеющегося)
-		:param window:
-		:param pos:
-		:param diff: Str - сложность убитого монстра
-		:return: None
-		"""
-		window.blit(self.image, pos)
+class Item:
+    """
+    Класс предмет
+    """
+    rarities = ['common', 'uncommon', 'rare', 'mythical', 'legendary']
+
+    def __init__(self, image, rarity, item_type):
+
+        self.image = image
+        self.rarity = rarity
+        self.type = item_type
+
+    def blit_image(self, window, pos):
+        window.blit(self.image, pos)
 
 
 class Weapon(Item):
-	stats = {
-		'common': 100,
-		'uncommon': 150,
-		'mythical': 200,
-		'legendary': 300,
-	}
+    stats = ((100, 120), (120, 150), (150, 170), (170, 200), (200, 250))
 
-	def __init__(self, image, rarity, type):
-		super().__init__(image, rarity, type)
-		self.image = image
-		self.rarity = rarity
-		self.type = type
-		self.stat = self.damage = self.stats[self.rarity]
+    def __init__(self, image, rarity, item_type):
+        super().__init__(image, rarity, item_type)
+        self.image = image
+        self.rarity = rarity
+        self.type = item_type
+        stats_index = self.rarities.index(self.rarity)
+        self.stat = random.randint(self.stats[stats_index][0], self.stats[stats_index][1])
 
 
 class Armor(Item):
-	stats = {
-		'common': 100,
-		'uncommon': 150,
-		'mythical': 200,
-		'legendary': 300,
-	}
+    stats = {
+        'boots': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
+        'trousers': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
+        'breastplate': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
+        'helmet': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
+    }
 
-	def __init__(self, image, rarity, type):
-		super().__init__(image, rarity, type)
-		self.image = image
-		self.rarity = rarity
-		self.type = type
-		self.stat = self.defense = self.stats[self.rarity]
+    def __init__(self, image, rarity, item_type):
+        super().__init__(image, rarity, item_type)
+        self.image = image
+        self.rarity = rarity
+        self.type = item_type
+        stats_index = self.rarities.index(self.rarity)
+        self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1])
+
+
+class HealingBottle:
+    """Класс зелья здоровья"""
+
+    def __init__(self):
+        self.timer = 0
+        self.created = False
+
+    def is_created(self):
+        """
+        Возвращает True/False в зависимости от того выпало ли зелье
+        :return: bool
+        """
+        return self.created
+
+    def drop(self, x, y):
+        """
+        Устанавливает координаты и рандомно выбирает количество лечения
+        :param x: int
+        :param y: int
+        :return: None
+        """
+        self.created = True
+        self.cords = (x, y)
+        self.heal = random.choices([50, 75, 100], weights=[5, 3, 1], k=1)[0]
+
+    def use_heal(self):
+        """
+        Устанавливает таймер на использование
+        :return: None
+        """
+        self.timer = 300
+
+    def can_use(self):
+        """
+        Возвращает True/False в зависимости от того можно ли использовать зелье
+        :return:
+        """
+        return self.timer <= 0
