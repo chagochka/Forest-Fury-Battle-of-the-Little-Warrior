@@ -221,6 +221,7 @@ inGame = False
 items = []
 run = True
 cycle = 0
+stop = "menu"
 font = pygame.font.SysFont(None, 25)
 while run:
 	for event in pygame.event.get():
@@ -265,6 +266,11 @@ while run:
 		# 	print(item.inventory_rarities, item.stats)
 
 		if key[pygame.K_ESCAPE]:
+			stop = "menu"
+			inGame = False
+
+		if key[pygame.K_p]:
+			stop = "level"
 			inGame = False
 
 		if key[pygame.K_h] or mouse[4]:
@@ -313,15 +319,24 @@ while run:
 		window.blit(monster_hp, (0, 685))
 
 	else:
-		pygame.mouse.set_visible(True)
-		window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+		if stop == "menu":
+			pygame.mouse.set_visible(True)
+			window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
-		if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-			300 >= pygame.mouse.get_pos()[1] >= 240:
-			inGame = True
-		if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-			480 >= pygame.mouse.get_pos()[1] >= 400:
-			break
+			if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+				300 >= pygame.mouse.get_pos()[1] >= 240:
+				inGame = True
+			if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+				480 >= pygame.mouse.get_pos()[1] >= 400:
+				break
+		elif stop == "level":
+			skilltree = pygame.image.load('images/skilltree.png')
+			pygame.mouse.set_visible(True)
+			window.blit(skilltree, (0, 0))
+
+			if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
+				450 >= pygame.mouse.get_pos()[1] >= 400:
+				inGame = True
 
 	cycle += 1
 	pygame.display.update()
