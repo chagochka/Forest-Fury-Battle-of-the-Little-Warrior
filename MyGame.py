@@ -83,8 +83,8 @@ class Monster:
 
 	def attack(self):
 		"""
-		 Атака по игроку (автоматически) + кд
-		 :return None
+		Атака по игроку (автоматически) + кд
+		:return None
 		"""
 		if player.attack_range() and self.hp > 0 >= self.timer:
 			player.damage_taken(self.atk)
