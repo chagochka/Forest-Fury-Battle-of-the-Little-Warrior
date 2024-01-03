@@ -38,10 +38,10 @@ class Weapon(Item):
 
 class Armor(Item):
 	stats = {
-		'common': 100,
-		'uncommon': 150,
-		'mythical': 200,
-		'legendary': 300,
+		'common': 5,
+		'uncommon': 10,
+		'mythical': 15,
+		'legendary': 20,
 	}
 
 	def __init__(self, image, rarity, type):

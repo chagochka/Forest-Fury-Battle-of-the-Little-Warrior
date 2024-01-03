@@ -30,7 +30,7 @@ class Monster:
 		self.x = random.randint(0, 1160)
 		self.y = random.randint(0, 610)
 
-		if player.score <= 2000:
+		if player.score <= 2500:
 			self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
 		else:
 			self.diff = 'boss'
@@ -47,15 +47,15 @@ class Monster:
 		if self.hp <= 0:
 			item_type = random.choice([Weapon, Armor])
 			rar = random.choices(list(item_type.stats.keys()),
-			                     weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])[0]
+								 weights=[4, 3, 2, 0.5] if self.diff != 'boss'else [0, 0, 0, 1])[0]
 			if item_type == Weapon:
 				items.append((Weapon(pygame.image.load(f'images/{rar}_sword.gif'), rar, 'sword'),
-				              (self.x, self.y), cycle))
+							  (self.x, self.y), cycle))
 			else:
 				armor_type = random.choices(['boots', 'trousers', 'helmet', 'breastplate'],
-				                            weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])[0]
+											weights=[4, 3, 2, 0.5] if self.diff != 'boss' else [0, 0, 0, 1])[0]
 				items.append((Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
-				              (self.x, self.y), cycle))
+							(self.x, self.y), cycle))
 			if player.score <= 2000:
 				player.health += 50
 			player.score += self.scores[self.diff]
