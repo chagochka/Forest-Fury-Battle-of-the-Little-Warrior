@@ -4,6 +4,7 @@ import pygame
 from pygame import transform
 
 from item import Weapon, Armor
+from SkillTree import SkillTree
 
 
 class Monster:
@@ -337,6 +338,8 @@ while run:
 			if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
 				450 >= pygame.mouse.get_pos()[1] >= 400:
 				inGame = True
+			SkillTree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+									  pygame.mouse.get_pressed()[0])
 
 	cycle += 1
 	pygame.display.update()
