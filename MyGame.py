@@ -381,10 +381,10 @@ while run:
             if cycle - drop_cycle == 1000:
                 items.pop(items.index((dropped_item, pos, drop_cycle)))  # удаление предметов с земли
 
-            if key[pygame.K_f]:
-                if player.find_item(pos[0], pos[1]) and \
-                        (not player.inventory[dropped_item.type] or
-                         dropped_item.stat > player.inventory[dropped_item.type].stat):
+            if (key[pygame.K_f]) or (
+                    abs(player.x - pos[0]) <= 50 and abs(player.y - pos[1] <= 50) and (not player.inventory[
+                dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat)):
+                if player.find_item(pos[0], pos[1]):
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
