@@ -208,7 +208,7 @@ def items_draw():
     y = 64  # вывод снаряжения
     for item in player.inventory.values():
         if item:
-            window.blit(item.image, (width - 64, y - 64))
+            window.blit(item.image, (window.get_width() - 64, y - 64))
             window.blit(font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
         y += 64
 
@@ -245,15 +245,15 @@ def inventory_draw():
     window.blit(inventory_cell, (width // 2 - 32, height - 64))
     window.blit(inventory_cell, (width // 2 + 32, height - 64))
     if player.items_inventory[0]:
-        window.blit(potion_inventory, (width // 2 - 96, height - 64))
+        window.blit(potion_inventory, (window.get_width() // 2 - 96, window.get_height() - 64))
         window.blit(font.render(str(player.items_inventory[0]), True, (200, 200, 200)),
                     (width // 2 - 96 + 48, height - 64 + 32))
     if player.items_inventory[1]:
-        window.blit(potion_inventory, (width // 2 - 32, height - 64))
+        window.blit(potion_inventory, (window.get_width() // 2 - 32, window.get_height() - 64))
         window.blit(font.render(str(player.items_inventory[1]), True, (200, 200, 200)),
                     (width // 2 - 32 + 48, height - 64 + 32))
     if player.items_inventory[2]:
-        window.blit(potion_inventory, (width // 2 + 32, height - 64))
+        window.blit(potion_inventory, (window.get_width() // 2 + 32, window.get_height() - 64))
         window.blit(font.render(str(player.items_inventory[2]), True, (200, 200, 200)),
                     (width // 2 + 32 + 48, height - 64 + 32))
 
