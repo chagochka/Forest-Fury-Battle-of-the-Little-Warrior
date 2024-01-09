@@ -84,3 +84,4 @@ class HealingBottle:
         :return:
         """
         return self.timer <= 0
+

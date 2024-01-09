@@ -4,7 +4,7 @@ import pygame
 from pygame import transform
 
 from item import *
-
+from UI import UI
 
 class Monster:
     """
@@ -32,6 +32,7 @@ class Monster:
         self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
         self.atk = self.monster_statistics[self.diff][0]
         self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][-1])
+        self.max_hp = self.hp
         self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
 
@@ -203,61 +204,6 @@ def draw_models():
     window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-
-def items_draw():
-    y = 64  # вывод снаряжения
-    for item in player.inventory.values():
-        if item:
-            window.blit(item.image, (width - 64, y - 64))
-            window.blit(font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
-        y += 64
-
-
-def write_stats():
-    """
-    Выводит на экран игры все надписи (хп героя, хп монстра, кд, хил, результат)
-    :return: None
-    """
-    Font = pygame.font.SysFont('timesnewroman', 30)  # отображает на экране хп и тд
-    health = Font.render('Player: ' + (str(player.health).split('.')[0] + 'hp' if player.health > 0 else 'Dead'),
-                         False, (0, 0, 0), (0, 150, 50))
-    window.blit(health, (0, 0))
-
-    heat = Font.render('Ready to heat: ' + str(player.timer <= 0), False, (0, 0, 0), (200, 100, 100))
-    window.blit(heat, (0, 33))
-
-    score = Font.render('Score: ' + str(player.score), False, (0, 0, 0), (200, 200, 0))
-    window.blit(score, (580, 0))
-
-    monster_hp = Font.render('Monster: ' + (str(monsters.hp) + 'hp' if monsters.hp > 0 else 'Dead'),
-                             False, (0, 0, 0), (0, 150, 100))
-    window.blit(monster_hp, (0, 685))
-
-
-def inventory_draw():
-    """
-    Рисует ячейки инвентаря и их содержимое
-    :return: None
-    """
-    font = pygame.font.SysFont(None, 40)
-
-    window.blit(inventory_cell, (width // 2 - 96, height - 64))
-    window.blit(inventory_cell, (width // 2 - 32, height - 64))
-    window.blit(inventory_cell, (width // 2 + 32, height - 64))
-    if player.items_inventory[0]:
-        window.blit(potion_inventory, (width // 2 - 96, height - 64))
-        window.blit(font.render(str(player.items_inventory[0]), True, (200, 200, 200)),
-                    (width // 2 - 96 + 48, height - 64 + 32))
-    if player.items_inventory[1]:
-        window.blit(potion_inventory, (width // 2 - 32, height - 64))
-        window.blit(font.render(str(player.items_inventory[1]), True, (200, 200, 200)),
-                    (width // 2 - 32 + 48, height - 64 + 32))
-    if player.items_inventory[2]:
-        window.blit(potion_inventory, (width // 2 + 32, height - 64))
-        window.blit(font.render(str(player.items_inventory[2]), True, (200, 200, 200)),
-                    (width // 2 + 32 + 48, height - 64 + 32))
-
-
 width, height = 1280, 720
 
 player = Player()
@@ -278,6 +224,8 @@ monster_textures = {
     'boss': pygame.image.load('images/boss.gif')
 }
 
+font = pygame.font.Font('font/joystix.ttf', 18)
+
 monster_model_right = monster_textures[monsters.diff]
 monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
@@ -285,12 +233,12 @@ menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
 potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
+ui = UI(window, font, player)
 
 inGame = False
 items = []
 run = True
 cycle = 0
-font = pygame.font.SysFont(None, 25)
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -392,11 +340,9 @@ while run:
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-        items_draw()
-
-        inventory_draw()
-
-        write_stats()
+        ui.items_draw()
+        ui.inventory_draw()
+        ui.write_stats(monsters)
 
         clock.tick(300)
     else:
@@ -414,5 +360,3 @@ while run:
     pygame.display.update()
 
 pygame.quit()
-
-"""не загружается другая картинка моба"""
