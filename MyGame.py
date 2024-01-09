@@ -4,7 +4,7 @@ import pygame
 from pygame import transform
 
 from item import *
-
+from UI import UI
 
 class Monster:
     """
@@ -278,6 +278,8 @@ monster_textures = {
     'boss': pygame.image.load('images/boss.gif')
 }
 
+font = pygame.font.SysFont(None, 25)
+
 monster_model_right = monster_textures[monsters.diff]
 monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
@@ -285,12 +287,12 @@ menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
 potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
+ui = UI(window, font, player, monsters)
 
 inGame = False
 items = []
 run = True
 cycle = 0
-font = pygame.font.SysFont(None, 25)
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -392,11 +394,9 @@ while run:
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-        items_draw()
-
-        inventory_draw()
-
-        write_stats()
+        ui.items_draw()
+        ui.inventory_draw()
+        ui.write_stats()
 
         clock.tick(300)
     else:

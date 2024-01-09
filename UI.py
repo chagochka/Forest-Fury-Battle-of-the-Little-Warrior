@@ -1,13 +1,13 @@
 import pygame
 
 class UI:
-	def __init__(self, window, font, player, monster):
+	def __init__(self, window, font, player, monsters):
 		self.window = window
 		self.font = font
 		self.player = player
-		self.monster = monster
+		self.monsters = monsters
 
-	def items_draw(self, values):
+	def items_draw(self):
 		y = 64  # вывод снаряжения
 		for item in self.player.inventory.values():
 			if item:
@@ -15,7 +15,7 @@ class UI:
 				self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
 			y += 64
 
-	def write_stats(self, player, monster):
+	def write_stats(self):
 		"""
 		Выводит на экран игры все надписи (хп героя, хп монстра, кд, хил, результат)
 		:return: None
@@ -49,11 +49,11 @@ class UI:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[0]), True, (200, 200, 200)),
 			            (self.window.get_width() // 2 - 96 + 48, self.window.get_height() - 64 + 32))
-		if player.items_inventory[1]:
+		if self.player.items_inventory[1]:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[1]), True, (200, 200, 200)),
 			            (self.window.get_width() // 2 - 32 + 48, self.window.get_height() - 64 + 32))
-		if player.items_inventory[2]:
+		if self.player.items_inventory[2]:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[2]), True, (200, 200, 200)),
 			            (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
