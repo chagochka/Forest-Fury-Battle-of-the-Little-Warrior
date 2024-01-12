@@ -226,8 +226,6 @@ monster_textures = {
 
 font = pygame.font.Font('font/joystix.ttf', 18)
 
-monster_model_right = monster_textures[monsters.diff]
-monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
@@ -277,7 +275,6 @@ while run:
             print('kill')
             del monsters
             monsters = Monster()
-            monster = monster_textures[monsters.diff]
 
         if key[pygame.K_m]:
             print('Cords= ' + str((player.x, player.y)), str((monsters.x, monsters.y)))
@@ -336,7 +333,8 @@ while run:
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
-        window.blit(monster_model_right if monsters.right else monster_model_left, (monsters.x, monsters.y))
+        monster = monster_textures[monsters.diff]
+        window.blit(monster if monsters.right else transform.flip(monster, True, False) , (monsters.x, monsters.y))
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
