@@ -87,7 +87,7 @@ class Monster:
             self.timer = 500
 
 
-class Player:
+class Player():
     """
     Класс игрока
     """

@@ -32,6 +32,12 @@ class UI:
 		pygame.draw.rect(self.window, '#222222', text_rect.inflate(20, 20), 3)
 		self.window.blit(text_surf, text_rect)
 
+		# Отрисовка общей защиты
+		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:]])), False, '#EEEEEE')
+		icon = pygame.image.load('images/armor.gif')
+		self.window.blit(icon, (10, 40))
+		self.window.blit(defens, (50, 45))
+
 		# Отрисовка полоски здоровья моба
 		pygame.draw.rect(self.window, '#222222', (10, 690, monsters.max_hp, 20))
 		pygame.draw.rect(self.window, (0, 150, 100), (10, 690, monsters.hp, 20))
