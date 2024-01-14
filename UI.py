@@ -39,9 +39,25 @@ class UI:
 		self.window.blit(defens, (50, 45))
 
 		# Отрисовка полоски здоровья моба
-		pygame.draw.rect(self.window, '#222222', (10, 690, monsters.max_hp, 20))
-		pygame.draw.rect(self.window, (0, 150, 100), (10, 690, monsters.hp, 20))
-		pygame.draw.rect(self.window, '#111111', (10, 690, monsters.max_hp, 20), 3)
+		if monsters.diff == 'boss':
+			pygame.draw.rect(self.window, '#222222', (
+				(self.window.get_width() / 2) - monsters.max_hp / 2, 10, monsters.max_hp, 20))
+			pygame.draw.rect(self.window, (0, 150, 100), (
+				(self.window.get_width() / 2) - monsters.hp / 2, 10, monsters.hp, 20))
+			pygame.draw.rect(self.window, '#111111', (
+				(self.window.get_width() / 2) - monsters.max_hp / 2, 10, monsters.max_hp, 20), 3)
+			font = pygame.font.Font('font/joystix.ttf', 30)
+			boss_text = font.render('DEMON', False, 'red')
+			self.window.blit(boss_text, (self.window.get_width() / 2 - boss_text.get_rect()[2] / 2, 40))
+		else:
+			pygame.draw.rect(self.window, '#222222', (
+				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2, monsters.y - 30, monsters.max_hp,
+				15))
+			pygame.draw.rect(self.window, (0, 150, 100), (
+				(monsters.x + monsters.texture.get_width() / 2) - monsters.hp / 2, monsters.y - 30, monsters.hp, 15))
+			pygame.draw.rect(self.window, '#111111', (
+				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2, monsters.y - 30, monsters.max_hp,
+				15), 3)
 
 	def inventory_draw(self):
 		"""

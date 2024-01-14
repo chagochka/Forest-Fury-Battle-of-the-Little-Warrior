@@ -35,6 +35,7 @@ class Monster:
         self.max_hp = self.hp
         self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
+        self.texture = []
 
     def is_life(self):
         """
@@ -333,8 +334,8 @@ while run:
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
-        monster = monster_textures[monsters.diff]
-        window.blit(monster if monsters.right else transform.flip(monster, True, False) , (monsters.x, monsters.y))
+        monsters.texture = monster_textures[monsters.diff]
+        window.blit(monsters.texture if monsters.right else transform.flip(monsters.texture, True, False) , (monsters.x, monsters.y))
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
