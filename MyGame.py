@@ -5,6 +5,8 @@ from pygame import transform
 
 from item import *
 from UI import UI
+from SkillTree import SkillTree
+
 
 class Monster:
     """
@@ -55,6 +57,8 @@ class Monster:
                 items.append((Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
                               (self.x, self.y), cycle))
             player.score += self.scores[self.diff]
+            player.level = player.level + 100
+            print(player.level)
             return False
         return True
 
@@ -87,7 +91,7 @@ class Monster:
             self.timer = 500
 
 
-class Player:
+class Player():
     """
     Класс игрока
     """
@@ -109,6 +113,7 @@ class Player:
             'boots': ''
         }
         self.items_inventory = [0, 0, 0]
+        self.level = SkillTree()
 
     def damage_taken(self, damage):
         """
@@ -204,6 +209,7 @@ def draw_models():
     window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
+
 width, height = 1280, 720
 
 player = Player()
@@ -226,8 +232,6 @@ monster_textures = {
 
 font = pygame.font.Font('font/joystix.ttf', 18)
 
-monster_model_right = monster_textures[monsters.diff]
-monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
@@ -235,6 +239,7 @@ potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
 ui = UI(window, font, player)
 
+stop = "menu"
 inGame = False
 items = []
 run = True
@@ -277,7 +282,6 @@ while run:
             print('kill')
             del monsters
             monsters = Monster()
-            monster = monster_textures[monsters.diff]
 
         if key[pygame.K_m]:
             print('Cords= ' + str((player.x, player.y)), str((monsters.x, monsters.y)))
@@ -289,6 +293,11 @@ while run:
             # print(items[0])
 
         if key[pygame.K_ESCAPE]:
+            stop = "menu"
+            inGame = False
+
+        if key[pygame.K_p]:
+            stop = "level"
             inGame = False
 
         if key[pygame.K_f]:  # на f поднимать предмет (64 пикселя)
@@ -336,7 +345,8 @@ while run:
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
-        window.blit(monster_model_right if monsters.right else monster_model_left, (monsters.x, monsters.y))
+        monster = monster_textures[monsters.diff]
+        window.blit(monster if monsters.right else transform.flip(monster, True, False) , (monsters.x, monsters.y))
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
@@ -346,15 +356,26 @@ while run:
 
         clock.tick(300)
     else:
-        pygame.mouse.set_visible(True)
-        window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        if stop == "menu":
+            pygame.mouse.set_visible(True)
+            window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                300 >= pygame.mouse.get_pos()[1] >= 240:
-            inGame = True
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                480 >= pygame.mouse.get_pos()[1] >= 400:
-            break
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    300 >= pygame.mouse.get_pos()[1] >= 240:
+                inGame = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    480 >= pygame.mouse.get_pos()[1] >= 400:
+                break
+        elif stop == "level":
+            skilltree = pygame.image.load('images/skilltree.png')
+            pygame.mouse.set_visible(True)
+            window.blit(skilltree, (0, 0))
+
+            if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
+                    450 >= pygame.mouse.get_pos()[1] >= 400:
+                inGame = True
+            player.level.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                         pygame.mouse.get_pressed()[0])
 
     cycle += 1
     pygame.display.update()

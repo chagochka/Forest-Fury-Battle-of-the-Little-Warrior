@@ -1,62 +1,82 @@
 class SkillTree:
-    def cursor_location(coor, clic):
+    def __init__(self, exp=0, points=0, pasivity=None):
+        if pasivity is None:
+            pasivity = {
+                'boot': False, 'lightning': False, 'banner': False,
+                'wind': False, 'dark_brotherhood': False, 'lay_down_the_bones': False,
+                'abaddon': False, 'accelerated_recharge': False, 'vampirism': False,
+                'the_witcher': False, 'shield': False, 'armor': False,
+                'broken_heart': False, 'response': False, 'enlightened': False,
+                'wolf_hysteria': False, 'eye_of_fate': False, 'pudge': False,
+                'stargazer': False
+            }
+        self.pasivity = pasivity
+        self.exp = exp
+        self.points = points
+
+    def __add__(self, other):
+        self.exp = self.exp + other
+        print(self.exp)
+        return SkillTree(exp=self.exp, points=self.points, pasivity=self.pasivity)
+
+    def cursor_location(self, coor, clic):
         x, y = coor
         if 400 < x < 450 and 115 < y < 150 and clic:
-            print(1)
+            self.boot()
 
         elif 330 < x < 375 and 70 < y < 115 and clic:
-            print(2)
+            self.lightning()
 
         elif 260 < x < 305 and 70 < y < 115 and clic:
-            print(3)
+            self.banner()
 
         elif 180 < x < 235 and 70 < y < 115 and clic:
-            print(4)
+            self.wind()
 
         elif 115 < x < 160 and 20 < y < 70 and clic:
-            print(5)
+            self.dark_brotherhood()
 
         elif 115 < x < 160 and 115 < y < 160 and clic:
-            print(6)
+            self.lay_down_the_bones()
 
         elif 40 < x < 90 and 70 < y < 115 and clic:
-            print(7)
+            self.abaddon()
 
         elif 330 < x < 375 and 175 < y < 225 and clic:
-            print(8)
+            self.accelerated_recharge()
 
         elif 250 < x < 300 and 175 < y < 225 and clic:
-            print(9)
+            self.vampirism()
 
         elif 175 < x < 225 and 175 < y < 225 and clic:
-            print(10)
+            self.the_witcher()
 
         elif 475 < x < 525 and 65 < y < 115 and clic:
-            print(11)
+            self.shield()
 
         elif 550 < x < 600 and 65 < y < 115 and clic:
-            print(12)
+            self.armor()
 
         elif 620 < x < 660 and 25 < y < 70 and clic:
-            print(13)
+            self.broken_heart()
 
         elif 700 < x < 740 and 25 < y < 70 and clic:
-            print(14)
+            self.response()
 
         elif 780 < x < 825 and 25 < y < 70 and clic:
-            print(15)
+            self.enlightened()
 
         elif 480 < x < 525 and 165 < y < 205 and clic:
-            print(16)
+            self.wolf_hysteria()
 
         elif 555 < x < 600 and 165 < y < 205 and clic:
-            print(17)
+            self.eye_of_fate()
 
         elif 620 < x < 665 and 115 < y < 160 and clic:
-            print(18)
+            self.pudge()
 
         elif 685 < x < 735 and 165 < y < 205 and clic:
-            print(19)
+            self.stargazer()
 
     def boot(self):
         """
@@ -209,5 +229,3 @@ class SkillTree:
         :return: None
         """
         pass
-
-
