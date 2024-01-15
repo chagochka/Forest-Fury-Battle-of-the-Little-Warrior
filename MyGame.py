@@ -5,6 +5,8 @@ from pygame import transform
 
 from item import *
 from UI import UI
+from SkillTree import SkillTree
+
 
 class Monster:
     """
@@ -109,6 +111,7 @@ class Player():
             'boots': ''
         }
         self.items_inventory = [0, 0, 0]
+        self.level = SkillTree()
 
     def damage_taken(self, damage):
         """
@@ -233,6 +236,7 @@ potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
 ui = UI(window, font, player)
 
+stop = "menu"
 inGame = False
 items = []
 run = True
@@ -286,6 +290,11 @@ while run:
             # print(items[0])
 
         if key[pygame.K_ESCAPE]:
+            stop = "menu"
+            inGame = False
+
+        if key[pygame.K_p]:
+            stop = "level"
             inGame = False
 
         if key[pygame.K_f]:  # на f поднимать предмет (64 пикселя)
@@ -344,15 +353,26 @@ while run:
 
         clock.tick(300)
     else:
-        pygame.mouse.set_visible(True)
-        window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        if stop == "menu":
+            pygame.mouse.set_visible(True)
+            window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                300 >= pygame.mouse.get_pos()[1] >= 240:
-            inGame = True
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                480 >= pygame.mouse.get_pos()[1] >= 400:
-            break
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    300 >= pygame.mouse.get_pos()[1] >= 240:
+                inGame = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    480 >= pygame.mouse.get_pos()[1] >= 400:
+                break
+        elif stop == "level":
+            skilltree = pygame.image.load('images/skilltree.png')
+            pygame.mouse.set_visible(True)
+            window.blit(skilltree, (0, 0))
+
+            if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
+                    450 >= pygame.mouse.get_pos()[1] >= 400:
+                inGame = True
+            player.level.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                         pygame.mouse.get_pressed()[0])
 
     cycle += 1
     pygame.display.update()
