@@ -1,5 +1,5 @@
 class SkillTree:
-    def cursor_location(coor, clic):
+    def cursor_location(self, coor, clic):
         x, y = coor
         if 400 < x < 450 and 115 < y < 150 and clic:
             print(1)
