@@ -246,10 +246,9 @@ while run:
     key = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed(5)
     clock = pygame.time.Clock()
+    pygame.mouse.set_visible(False)
 
     if inGame:
-        pygame.mouse.set_visible(False)
-
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -345,8 +344,8 @@ while run:
 
         clock.tick(300)
     else:
-        pygame.mouse.set_visible(True)
         window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        ui.set_cursor()
 
         if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                 300 >= pygame.mouse.get_pos()[1] >= 240:
