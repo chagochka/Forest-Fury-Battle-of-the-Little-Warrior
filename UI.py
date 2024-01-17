@@ -1,5 +1,6 @@
 import pygame
 
+
 class UI:
 	def __init__(self, window, font, player):
 		self.window = window

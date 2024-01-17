@@ -113,7 +113,7 @@ class Player():
             'boots': ''
         }
         self.items_inventory = [0, 0, 0]
-        self.level = SkillTree()
+        self.level = 0
 
     def damage_taken(self, damage):
         """
@@ -244,6 +244,9 @@ inGame = False
 items = []
 run = True
 cycle = 0
+
+tree = SkillTree(player, window, font)
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -374,7 +377,7 @@ while run:
             if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
                     450 >= pygame.mouse.get_pos()[1] >= 400:
                 inGame = True
-            player.level.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+            tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                          pygame.mouse.get_pressed()[0])
 
     cycle += 1
