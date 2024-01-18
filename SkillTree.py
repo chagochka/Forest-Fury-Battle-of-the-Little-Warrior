@@ -13,17 +13,71 @@ class SkillTree:
             "",
             ""
         ]
+        self.spell = {
+            "Сапоги Гермеса": False,
+            "Светик-Сто-Смертник": False,
+            "Вдохновляющий стяг": False,
+            "Дуновение ветерка": False,
+            "Тёмное братство": False,
+            "Лечь костями": False,
+            "Абаддон": False,
+            "КДАБР": False,
+            "Разбитое сердце": False,
+            "Кровосися": False,
+            "Геральт с гор": False,
+            "Я есть грунт": False,
+            "Сила майнкрфта": False,
+            "Просвящённый": False,
+            "Волчья истерика": False,
+            "Удача Дрима": False,
+            "Пудж": False,
+            "Звездочёт": False,
+            "Я терпила": False
+        }
+        self.points = 1
+        self.all_points = 2
+        self.error = ''
+
+    def point(self, score):
+        if score > 1000 * self.all_points + 500:
+            self.points += 1
+            self.all_points += 1
 
     def new_text(self):
         # вывод названия перка
         text_surf = self.font.render(str(self.title), False, (0, 0, 0))
         text_rect = text_surf.get_rect(bottomleft=(65, 310))
         self.window.blit(text_surf, text_rect)
+
+        if self.error:
+            text_surf = self.font.render(self.error, False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(460, 370))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
+        # ввывод изучена ли пасивка
+        if self.title != "":
+            text_rect = text_surf.get_rect(bottomleft=(70, 270))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            if self.spell[self.title]:
+                text_surf = self.font.render("Изучено", False, (0, 0, 0))
+                self.window.blit(text_surf, text_rect)
+            else:
+                # Если не изучен
+                text_surf = self.font.render("Не изучено", False, (0, 0, 0))
+                self.window.blit(text_surf, text_rect)
         # вывод описания перка
         for i in range(4):
             text_surf = self.font.render(str(self.description[i]), False, (0, 0, 0))
             text_rect = text_surf.get_rect(bottomleft=(65, 350 + i * 25))
             self.window.blit(text_surf, text_rect)
+        # ввывод очков прокачки
+        text_surf = self.font.render(f"Очки улучшений: {str(self.points)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(460, 320))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
 
     def cursor_location(self, coor, clic):
         x, y = coor
@@ -84,6 +138,17 @@ class SkillTree:
 
         elif 685 < x < 735 and 165 < y < 205 and clic:
             self.stargazer()
+
+        elif 300 < x < 420 and 280 < y < 310 and clic:
+            self.contnue()
+
+    def contnue(self):
+        if not self.spell[self.title] and self.points >= 1:
+            self.spell[self.title] = True
+            if self.title == "Разбитое сердцe":
+                self.player.max_health = 2500
+        elif not self.spell[self.title] and self.points == 0:
+            self.error = "Недостаточно ОУ"
 
     def boot(self):
         """
