@@ -34,7 +34,8 @@ class UI:
 		self.window.blit(text_surf, text_rect)
 
 		# Отрисовка общей защиты
-		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:]])), False, '#EEEEEE')
+		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:]])), 
+					  False, '#EEEEEE')
 		icon = pygame.image.load('images/armor.gif')
 		self.window.blit(icon, (10, 40))
 		self.window.blit(defens, (50, 45))
