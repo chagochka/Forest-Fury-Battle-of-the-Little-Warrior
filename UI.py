@@ -75,15 +75,15 @@ class UI:
 		if self.player.items_inventory[0]:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[0]), True, (200, 200, 200)),
-			            (self.window.get_width() // 2 - 96 + 48, self.window.get_height() - 64 + 32))
+			            	 (self.window.get_width() // 2 - 96 + 48, self.window.get_height() - 64 + 32))
 		if self.player.items_inventory[1]:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[1]), True, (200, 200, 200)),
-			            (self.window.get_width() // 2 - 32 + 48, self.window.get_height() - 64 + 32))
+			            	 (self.window.get_width() // 2 - 32 + 48, self.window.get_height() - 64 + 32))
 		if self.player.items_inventory[2]:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[2]), True, (200, 200, 200)),
-			            (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
+			            	 (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
 
 	def set_cursor(self):
 		self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
