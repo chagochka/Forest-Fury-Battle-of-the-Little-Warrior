@@ -7,7 +7,6 @@ from item import *
 from UI import UI
 from SkillTree import SkillTree
 
-
 class Monster:
     """
     Класс монстра
@@ -40,6 +39,7 @@ class Monster:
         else:
             self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
+        self.texture = []
 
     def is_life(self):
         """
@@ -100,8 +100,8 @@ class Player():
 
     def __init__(self):
         self.health = 500
-        self.attack = 50
         self.max_health = 1000
+        self.attack = 50
         self.x = 580
         self.y = 305
         self.timer = 0
@@ -182,7 +182,6 @@ class Player():
             coof = 2
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
-            self.right = False
 
     def move_right(self):  # Движение игрока по карте
         """
@@ -194,7 +193,6 @@ class Player():
             coof = 2
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
-            self.right = True
 
     def move_down(self):  # Движение игрока по карте
         """
@@ -246,7 +244,6 @@ def draw_models():
     window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-
 width, height = 1280, 720
 
 player = Player()
@@ -292,10 +289,9 @@ while run:
     key = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed(5)
     clock = pygame.time.Clock()
+    pygame.mouse.set_visible(False)
 
     if inGame:
-        pygame.mouse.set_visible(False)
-
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -388,6 +384,8 @@ while run:
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
+        monsters.texture = monster_textures[monsters.diff]
+        window.blit(monsters.texture if monsters.right else transform.flip(monsters.texture, True, False) , (monsters.x, monsters.y))
         monster = monster_textures[monsters.diff]
         window.blit(monster if monsters.right else transform.flip(monster, True, False) , (monsters.x, monsters.y))
         window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
@@ -399,6 +397,8 @@ while run:
 
         clock.tick(300)
     else:
+        window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        ui.set_cursor()
         if stop == "menu":
             pygame.mouse.set_visible(True)
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
@@ -419,7 +419,6 @@ while run:
                 inGame = True
             tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                          pygame.mouse.get_pressed()[0])
-
     cycle += 1
     pygame.display.update()
 
