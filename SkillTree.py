@@ -1,70 +1,168 @@
+import pygame
+
+
 class SkillTree:
+    def __init__(self, player, window, font):
+        self.player = player
+        self.window = window
+        self.font = font
+        self.title = ""
+        self.description = [
+            "",
+            "",
+            "",
+            ""
+        ]
+        self.spell = {
+            "Сапоги Гермеса": False,
+            "Светик-Сто-Смертник": False,
+            "Вдохновляющий стяг": False,
+            "Дуновение ветерка": False,
+            "Тёмное братство": False,
+            "Лечь костями": False,
+            "Абаддон": False,
+            "КДАБР": False,
+            "Разбитое сердце": False,
+            "Кровосися": False,
+            "Геральт с гор": False,
+            "Я есть грунт": False,
+            "Сила майнкрфта": False,
+            "Просвящённый": False,
+            "Волчья истерика": False,
+            "Удача Дрима": False,
+            "Пудж": False,
+            "Звездочёт": False,
+            "Я терпила": False
+        }
+        self.points = 1
+        self.all_points = 2
+        self.error = ''
+
+    def point(self, score):
+        if score > 1000 * self.all_points + 500:
+            self.points += 1
+            self.all_points += 1
+
+    def new_text(self):
+        # вывод названия перка
+        text_surf = self.font.render(str(self.title), False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(65, 310))
+        self.window.blit(text_surf, text_rect)
+
+        if self.error:
+            text_surf = self.font.render(self.error, False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(460, 370))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
+        # ввывод изучена ли пасивка
+        if self.title != "":
+            text_rect = text_surf.get_rect(bottomleft=(70, 270))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            if self.spell[self.title]:
+                text_surf = self.font.render("Изучено", False, (0, 0, 0))
+                self.window.blit(text_surf, text_rect)
+            else:
+                # Если не изучен
+                text_surf = self.font.render("Не изучено", False, (0, 0, 0))
+                self.window.blit(text_surf, text_rect)
+        # вывод описания перка
+        for i in range(4):
+            text_surf = self.font.render(str(self.description[i]), False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(65, 350 + i * 25))
+            self.window.blit(text_surf, text_rect)
+        # ввывод очков прокачки
+        text_surf = self.font.render(f"Очки улучшений: {str(self.points)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(460, 320))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
     def cursor_location(self, coor, clic):
         x, y = coor
+        self.new_text()
         if 400 < x < 450 and 115 < y < 150 and clic:
-            print(1)
+            self.boot()
 
         elif 330 < x < 375 and 70 < y < 115 and clic:
-            print(2)
+            self.lightning()
 
         elif 260 < x < 305 and 70 < y < 115 and clic:
-            print(3)
+            self.banner()
 
         elif 180 < x < 235 and 70 < y < 115 and clic:
-            print(4)
+            self.wind()
 
         elif 115 < x < 160 and 20 < y < 70 and clic:
-            print(5)
+            self.dark_brotherhood()
 
         elif 115 < x < 160 and 115 < y < 160 and clic:
-            print(6)
+            self.lay_down_the_bones()
 
         elif 40 < x < 90 and 70 < y < 115 and clic:
-            print(7)
+            self.abaddon()
 
         elif 330 < x < 375 and 175 < y < 225 and clic:
-            print(8)
+            self.accelerated_recharge()
 
         elif 250 < x < 300 and 175 < y < 225 and clic:
-            print(9)
+            self.vampirism()
 
         elif 175 < x < 225 and 175 < y < 225 and clic:
-            print(10)
+            self.the_witcher()
 
         elif 475 < x < 525 and 65 < y < 115 and clic:
-            print(11)
+            self.shield()
 
         elif 550 < x < 600 and 65 < y < 115 and clic:
-            print(12)
+            self.armor()
 
         elif 620 < x < 660 and 25 < y < 70 and clic:
-            print(13)
+            self.broken_heart()
 
         elif 700 < x < 740 and 25 < y < 70 and clic:
-            print(14)
+            self.response()
 
         elif 780 < x < 825 and 25 < y < 70 and clic:
-            print(15)
+            self.enlightened()
 
         elif 480 < x < 525 and 165 < y < 205 and clic:
-            print(16)
+            self.wolf_hysteria()
 
         elif 555 < x < 600 and 165 < y < 205 and clic:
-            print(17)
+            self.eye_of_fate()
 
         elif 620 < x < 665 and 115 < y < 160 and clic:
-            print(18)
+            self.pudge()
 
         elif 685 < x < 735 and 165 < y < 205 and clic:
-            print(19)
+            self.stargazer()
+
+        elif 300 < x < 420 and 280 < y < 310 and clic:
+            self.contnue()
+
+    def contnue(self):
+        if not self.spell[self.title] and self.points >= 1:
+            self.spell[self.title] = True
+            if self.title == "Разбитое сердцe":
+                self.player.max_health = 2500
+        elif not self.spell[self.title] and self.points == 0:
+            self.error = "Недостаточно ОУ"
 
     def boot(self):
         """
         Название пассиыного навыка: Сапоги Гермеса
-        Меняет скорость перемещения персонажа
+        Увеличивает скорость перемещения персонажа
         :return: None
         """
-        pass
+        self.title = "Сапоги Гермеса"
+        self.description = [
+            "Увеличивают скорость",
+            'перемещения персонажа',
+            '',
+            ''
+        ]
 
     def lightning(self):
         """
@@ -72,7 +170,13 @@ class SkillTree:
         Добавление плоского урона персонажу
         :return: None
         """
-        pass
+        self.title = "Светик-Сто-Смертник"
+        self.description = [
+            "Добавление плоского",
+            'урона персонажу',
+            '',
+            ''
+        ]
 
     def banner(self):
         """
@@ -80,7 +184,13 @@ class SkillTree:
         Добавление процентного урона персонажу
         :return: None
         """
-        pass
+        self.title = "Вдохновляющий стяг"
+        self.description = [
+            "Добавление процентного",
+            'урона для персонажа',
+            '',
+            ''
+        ]
 
     def wind(self):
         """
@@ -88,15 +198,27 @@ class SkillTree:
         Отталкивает врага при атаке
         :return: None
         """
-        pass
+        self.title = "Дуновение ветерка"
+        self.description = [
+            "Отталкивает врага",
+            'при атаке',
+            '',
+            ''
+        ]
 
     def dark_brotherhood(self):
         """
         Название пассиыного навыка: Тёмное братство
-        Если враг умер от одной атаки добавляет немного здоровья
+        Если враг умер от одной атаки востанавливает немного здоровья
         :return: None
         """
-        pass
+        self.title = "Тёмное братство"
+        self.description = [
+            "Если враг умер от",
+            'одной атаки,',
+            'востанавливает немного',
+            'здоровья'
+        ]
 
     def lay_down_the_bones(self):
         """
@@ -104,7 +226,13 @@ class SkillTree:
         Защищает от смертельной атаки
         :return: None
         """
-        pass
+        self.title = "Лечь костями"
+        self.description = [
+            "Защищает от",
+            'смертельной атаки',
+            '',
+            ''
+        ]
 
     def abaddon(self):
         """
@@ -112,7 +240,13 @@ class SkillTree:
         после убийства врага следующая атака по игроку не нанесёт урона
         :return: None
         """
-        pass
+        self.title = "Абаддон"
+        self.description = [
+            "После убийства 2-го врага,",
+            'следующая атака по игроку',
+            'не нанесёт урона',
+            ''
+        ]
 
     def accelerated_recharge(self):
         """
@@ -120,23 +254,41 @@ class SkillTree:
         ускоряет перезарядку атаки
         :return: None
         """
-        pass
+        self.title = "КДАБР"
+        self.description = [
+            "ускоряет перезарядку",
+            'атаки',
+            '',
+            ''
+        ]
 
     def vampirism(self):
         """
         Название пассиыного навыка: Кровосися
-        Добовляет по 5% от здоровья врага после нанесения удара
+        Добовляет по 5% здоровья от атаки
         :return: None
         """
-        pass
+        self.title = "Кровосися"
+        self.description = [
+            "Добавляет по 5%",
+            'здоровья от атаки',
+            '',
+            ''
+        ]
 
     def the_witcher(self):
         """
-        Название пассиыного навыка: Геральт из Кавказа
-        Позволяет получить карточку монстра
+        Название пассиыного навыка: Геральт с гор
+        Позволяет получить ничего
         :return: None
         """
-        pass
+        self.title = "Геральт с гор"
+        self.description = [
+            "Позволяет получить",
+            'чеканную монету',
+            '(нет)',
+            ''
+        ]
 
     def shield(self):
         """
@@ -144,7 +296,13 @@ class SkillTree:
         Добовляет естественную защиту 5
         :return: None
         """
-        pass
+        self.title = "Я есть грунт"
+        self.description = [
+            "(ням-ням)",
+            'Добавляет естественную',
+            'защиту 5',
+            ''
+        ]
 
     def armor(self):
         """
@@ -152,15 +310,27 @@ class SkillTree:
         Добовляет шипы 1 на персонажа
         :return: None
         """
-        pass
+        self.title = "Сила майнкрфта"
+        self.description = [
+            "Добавляет шипы 1",
+            'на персонажа',
+            '',
+            ''
+        ]
 
     def broken_heart(self):
         """
         Название пассиыного навыка: Разбитое сердце
-        Увеличивает максимум здоровья в 2 раза, делая текущее здоровье равным четверти максимума
+        Увеличивает максимум здоровья в 2 раза
         :return: None
         """
-        pass
+        self.title = "Разбитое сердце"
+        self.description = [
+            "Увеличивает максимум",
+            'здоровья в 2 раза',
+            '',
+            ''
+        ]
 
     def response(self):
         """
@@ -168,7 +338,13 @@ class SkillTree:
         Если здоровье меньше 10% от максимума увеличивает естественую защиту на 10
         :return: None
         """
-        pass
+        self.title = "Я терпила"
+        self.description = [
+            "Если здоровье меньше",
+            '10% от максимума,',
+            'увеличивает',
+            'защиту на 10'
+        ]
 
     def enlightened(self):
         """
@@ -176,15 +352,27 @@ class SkillTree:
         Усиляет шипы 1 до шипы 3 даёт вампиризм шипам 10% от полученого урона
         :return: None
         """
-        pass
+        self.title = "Просвящённый"
+        self.description = [
+            "Усиляет шипы до 3-го,",
+            'вампиризм шипам',
+            'в размере - 10%',
+            ''
+        ]
 
     def wolf_hysteria(self):
         """
         Название пассиыного навыка: Волчья истерика
-        если здоровья меньше 1% увеличивает урон в двое
+        если здоровья меньше 5% увеличивает урон в двое
         :return: None
         """
-        pass
+        self.title = "Волчья истерика"
+        self.description = [
+            "Если здоровья меньше",
+            '5%, увеличивает урон',
+            'в 2 раза',
+            ''
+        ]
 
     def eye_of_fate(self):
         """
@@ -192,7 +380,13 @@ class SkillTree:
         Увеличивает шанс выпадения легендарки
         :return: None
         """
-        pass
+        self.title = "Удача Дрима"
+        self.description = [
+            "Ему не нужна удача",
+            '',
+            '',
+            ''
+        ]
 
     def pudge(self):
         """
@@ -200,7 +394,13 @@ class SkillTree:
         Увеличивает максимальное здоровье за каждое убийство ценой потери 10% ночального здоровья
         :return: None
         """
-        pass
+        self.title = "Пудж"
+        self.description = [
+            "Твой злейший враг",
+            '',
+            '',
+            ''
+        ]
 
     def stargazer(self):
         """
@@ -208,6 +408,10 @@ class SkillTree:
         Даёт шанс затанить существо с 10% вероятностью при его спавне до смерти
         :return: None
         """
-        pass
-
-
+        self.title = "Звездочёт"
+        self.description = [
+            "Даёт шанс игроку",
+            'застанить существо',
+            'при его спавне',
+            ''
+        ]
