@@ -46,12 +46,14 @@ class Armor(Item):
         self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1])
 
 
-class HealingBottle:
+class HealingBottle(Item):
     """Класс зелья здоровья"""
 
-    def __init__(self):
+    def __init__(self, image, rarity, item_type):
+        super().__init__(image, rarity, item_type)
         self.timer = 0
         self.created = False
+        self.stat = 100
 
     def is_created(self):
         """

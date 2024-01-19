@@ -4,6 +4,7 @@ import pygame
 from pygame import transform
 
 from item import *
+from UI import UI
 
 
 class Monster:
@@ -11,29 +12,37 @@ class Monster:
     Класс монстра
     """
 
-    def __init__(self):
+    def __init__(self, boss_type=None):
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
-            'low': [20, (100, 150), 0.7],  # атака, хп монстра
-            'medium': [50, (150, 200), 0.5],
-            'high': [75, (200, 250), 0.3],
-            'boss': [100, (250, 500), 0.3]
+            'low': [20, (100, 150), 0.7, 64],  # атака, хп монстра
+            'medium': [50, (150, 200), 0.5, 64],
+            'high': [75, (200, 250), 0.3, 64],
+            'boss': [100, (250, 500), 0.3, 64],
+            'boss_eye': [250, (2499, 2500), 0.25, 64]  # надо переделать под дальнюю атаку
         }
         self.timer = 0
         self.scores = {
             'low': 50,
             'medium': 100,
             'high': 150,
-            'boss': 200
+            'boss': 200,
+            'boss_eye': 500
         }
 
         self.x = random.randint(0, 1160)
         self.y = random.randint(0, 610)
-        self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
+        if boss_type is None:  # супер боссы
+            self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
+        else:
+            self.diff = boss_type
         self.atk = self.monster_statistics[self.diff][0]
-        self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][-1])
-        self.speed = self.monster_statistics[self.diff][-1]
+        self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][1])
+        self.max_hp = self.hp
+        self.speed = self.monster_statistics[self.diff][2]
         self.right = True
+        self.attack_range = self.monster_statistics[self.diff][3]
+        self.texture = []
 
     def is_life(self):
         """
@@ -81,7 +90,7 @@ class Monster:
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if player.attack_range() and self.hp > 0 >= self.timer and not player.immortality:
+        if player.attack_range(self.attack_range) and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
 
@@ -100,6 +109,7 @@ class Player:
         self.score = 0
         self.right = True
         self.immortality = False
+        self.global_bosses = 0
         self.inventory = {
             'sword': '',
             'helmet': '',
@@ -134,12 +144,13 @@ class Player:
                 monsters.is_life()
                 player.timer = 300
 
-    def attack_range(self):  # радиус атаки
+    def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
         :return: bool
         """
-        return -128 <= self.x - monsters.x <= 128 and -128 <= self.y - monsters.y <= 128
+        return (-attack_range <= self.x - monsters.x <= attack_range and
+                -attack_range <= self.y - monsters.y <= attack_range)
 
     def move_left(self):  # Движение игрока по карте
         """
@@ -204,65 +215,16 @@ def draw_models():
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
 
-def items_draw():
-    y = 64  # вывод снаряжения
-    for item in player.inventory.values():
-        if item:
-            window.blit(item.image, (width - 64, y - 64))
-            window.blit(font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
-        y += 64
-
-
-def write_stats():
-    """
-    Выводит на экран игры все надписи (хп героя, хп монстра, кд, хил, результат)
-    :return: None
-    """
-    Font = pygame.font.SysFont('timesnewroman', 30)  # отображает на экране хп и тд
-    health = Font.render('Player: ' + (str(player.health).split('.')[0] + 'hp' if player.health > 0 else 'Dead'),
-                         False, (0, 0, 0), (0, 150, 50))
-    window.blit(health, (0, 0))
-
-    heat = Font.render('Ready to heat: ' + str(player.timer <= 0), False, (0, 0, 0), (200, 100, 100))
-    window.blit(heat, (0, 33))
-
-    score = Font.render('Score: ' + str(player.score), False, (0, 0, 0), (200, 200, 0))
-    window.blit(score, (580, 0))
-
-    monster_hp = Font.render('Monster: ' + (str(monsters.hp) + 'hp' if monsters.hp > 0 else 'Dead'),
-                             False, (0, 0, 0), (0, 150, 100))
-    window.blit(monster_hp, (0, 685))
-
-
-def inventory_draw():
-    """
-    Рисует ячейки инвентаря и их содержимое
-    :return: None
-    """
-    font = pygame.font.SysFont(None, 40)
-
-    window.blit(inventory_cell, (width // 2 - 96, height - 64))
-    window.blit(inventory_cell, (width // 2 - 32, height - 64))
-    window.blit(inventory_cell, (width // 2 + 32, height - 64))
-    if player.items_inventory[0]:
-        window.blit(potion_inventory, (width // 2 - 96, height - 64))
-        window.blit(font.render(str(player.items_inventory[0]), True, (200, 200, 200)),
-                    (width // 2 - 96 + 48, height - 64 + 32))
-    if player.items_inventory[1]:
-        window.blit(potion_inventory, (width // 2 - 32, height - 64))
-        window.blit(font.render(str(player.items_inventory[1]), True, (200, 200, 200)),
-                    (width // 2 - 32 + 48, height - 64 + 32))
-    if player.items_inventory[2]:
-        window.blit(potion_inventory, (width // 2 + 32, height - 64))
-        window.blit(font.render(str(player.items_inventory[2]), True, (200, 200, 200)),
-                    (width // 2 + 32 + 48, height - 64 + 32))
+def game_over():
+    picture = pygame.image.load('images/game_over.jpg')
+    window.blit(picture, (0, 0))
 
 
 width, height = 1280, 720
 
 player = Player()
 monsters = Monster()
-bottle = HealingBottle()
+bottle = HealingBottle(pygame.image.load('images/potion.gif'), 'rare', 'potion')
 
 pygame.init()
 window = pygame.display.set_mode((width, height))
@@ -275,22 +237,23 @@ monster_textures = {
     'low': pygame.image.load('images/slither.gif'),
     'medium': pygame.image.load('images/spider.gif'),
     'high': pygame.image.load('images/knight.gif'),
-    'boss': pygame.image.load('images/boss.gif')
+    'boss': pygame.image.load('images/boss.gif'),
+    'boss_eye': pygame.image.load('images/boss_eye.gif')
 }
 
-monster_model_right = monster_textures[monsters.diff]
-monster_model_left = transform.flip(monster_model_right, True, False)  # монстр смотрящий влево
+font = pygame.font.Font('font/joystix.ttf', 18)
+
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
 potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
+ui = UI(window, font, player)
 
 inGame = False
 items = []
 run = True
 cycle = 0
-font = pygame.font.SysFont(None, 25)
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -299,10 +262,9 @@ while run:
     key = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed(5)
     clock = pygame.time.Clock()
+    pygame.mouse.set_visible(False)
 
     if inGame:
-        pygame.mouse.set_visible(False)
-
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -316,7 +278,7 @@ while run:
         if key[pygame.K_t]:
             print(monsters.timer)
         if key[pygame.K_j]:
-            player.immortality = True
+            player.immortality = not player.immortality
 
         monsters.monster_move()
         monsters.attack()
@@ -328,8 +290,11 @@ while run:
             bottle.drop(monsters.x, monsters.y)  # нужно сделать геттер
             print('kill')
             del monsters
-            monsters = Monster()
-            monster = monster_textures[monsters.diff]
+            if player.score >= 5000 and player.global_bosses == 0:
+                monsters = Monster('boss_eye')
+                player.global_bosses += 1
+            else:
+                monsters = Monster()
 
         if key[pygame.K_m]:
             print('Cords= ' + str((player.x, player.y)), str((monsters.x, monsters.y)))
@@ -381,27 +346,31 @@ while run:
             if cycle - drop_cycle == 1000:
                 items.pop(items.index((dropped_item, pos, drop_cycle)))  # удаление предметов с земли
 
-            if key[pygame.K_f]:
-                if player.find_item(pos[0], pos[1]) and \
-                        (not player.inventory[dropped_item.type] or
-                         dropped_item.stat > player.inventory[dropped_item.type].stat):
+            if (key[pygame.K_f]) or (
+                    abs(player.x - pos[0]) <= 50 and abs(player.y - pos[1] <= 50) and (not player.inventory[
+                dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat)):
+                if player.find_item(pos[0], pos[1]):
                     player.inventory[dropped_item.type] = dropped_item
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
-        window.blit(monster_model_right if monsters.right else monster_model_left, (monsters.x, monsters.y))
-        window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
+        monsters.texture = monster_textures[monsters.diff]
+        indent = 128 if monsters.diff == 'boss_eye' else 64
+        window.blit(monsters.texture if monsters.right else transform.flip(monsters.texture, True, False),
+                    (monsters.x - indent, monsters.y - indent))
+        window.blit(player_model_right if player.right else player_model_left, (player.x - 64, player.y - 64))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-        items_draw()
+        ui.items_draw()
+        ui.inventory_draw()
+        ui.write_stats(monsters)
 
-        inventory_draw()
-
-        write_stats()
+        if player.health <= 0:
+            game_over()
 
         clock.tick(300)
     else:
-        pygame.mouse.set_visible(True)
         window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        ui.set_cursor()
 
         if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                 300 >= pygame.mouse.get_pos()[1] >= 240:
@@ -414,5 +383,3 @@ while run:
     pygame.display.update()
 
 pygame.quit()
-
-"""не загружается другая картинка моба"""
