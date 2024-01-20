@@ -290,6 +290,7 @@ while run:
     mouse = pygame.mouse.get_pressed(5)
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(False)
+    window.blit(background, (0, 0))  # фон
 
     if inGame:
         if key[pygame.K_d] and player.x < 1160:  # движение героя
@@ -368,8 +369,6 @@ while run:
                 player.items_inventory[2] -= 1
                 bottle.use_heal()
 
-        window.blit(background, (0, 0))  # фон, монстр, игрок
-
         for dropped_item, pos, drop_cycle in items:
 
             dropped_item.blit_image(window, pos)
@@ -397,10 +396,7 @@ while run:
 
         clock.tick(300)
     else:
-        window.blit(menu, (0, 0))  # меню игры, кнопки и тд
-        ui.set_cursor()
         if stop == "menu":
-            pygame.mouse.set_visible(True)
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
@@ -411,7 +407,6 @@ while run:
                 break
         elif stop == "level":
             skilltree = pygame.image.load('images/skilltree.png')
-            pygame.mouse.set_visible(True)
             window.blit(skilltree, (0, 0))
 
             if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
@@ -419,6 +414,7 @@ while run:
                 inGame = True
             tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                          pygame.mouse.get_pressed()[0])
+        ui.set_cursor()
     cycle += 1
     pygame.display.update()
 
