@@ -2,25 +2,25 @@ import pygame
 
 
 class UI:
-    def __init__(self, window, font, player):
-        self.window = window
-        self.font = font
-        self.player = player
+	def __init__(self, window, font, player):
+		self.window = window
+		self.font = font
+		self.player = player
 
-    def items_draw(self):
-        y = 64  # вывод снаряжения
-        for item in self.player.inventory.values():
-            if item:
-                self.window.blit(item.image, (self.window.get_width() - 64, y - 64))
-                self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
-            y += 64
+	def items_draw(self):
+		y = 64  # вывод снаряжения
+		for item in self.player.inventory.values():
+			if item:
+				self.window.blit(item.image, (self.window.get_width() - 64, y - 64))
+				self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
+			y += 64
 
-    def write_stats(self, monsters):
-        """
-		Выводит на экран игры все надписи (хп героя, хп монстра, кд, хил, результат)
-		:return: None
-		"""
-
+	def write_stats(self, monsters):
+		    """
+		    Выводит на экран игры все надписи (хп героя, хп монстра, кд, хил, результат)
+		    :return: None
+		    """
+      
         # Отрисовка полоски здоровья игрока
         pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
         pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
@@ -87,9 +87,9 @@ class UI:
 
     def inventory_draw(self):
         """
-		Рисует ячейки инвентаря и их содержимое
-		:return: None
-		"""
+		    Рисует ячейки инвентаря и их содержимое
+		    :return: None
+		    """
         inventory_cell = pygame.image.load('images/inventory.gif')
         potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 
@@ -111,3 +111,4 @@ class UI:
 
     def set_cursor(self):
         self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
+

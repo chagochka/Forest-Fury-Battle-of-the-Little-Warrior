@@ -5,14 +5,14 @@ from pygame import transform
 
 from item import *
 from UI import UI
-
+from SkillTree import SkillTree
 
 class Monster:
     """
     Класс монстра
     """
 
-    def __init__(self, boss_type=None):
+    def __init__(self, speed=False, boss_type=None):
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
             'low': [20, (100, 150), 0.7, 64],  # атака, хп монстра
@@ -28,6 +28,7 @@ class Monster:
             'high': 150,
             'boss': 200,
             'boss_eye': 500
+
         }
 
         self.x = random.randint(0, 1160)
@@ -39,7 +40,10 @@ class Monster:
         self.atk = self.monster_statistics[self.diff][0]
         self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][1])
         self.max_hp = self.hp
-        self.speed = self.monster_statistics[self.diff][2]
+        if speed:
+            self.speed = 0
+        else:
+            self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
         self.attack_range = self.monster_statistics[self.diff][3]
         self.texture = []
@@ -63,6 +67,7 @@ class Monster:
                 items.append((Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
                               (self.x, self.y), cycle))
             player.score += self.scores[self.diff]
+            tree.point(player.score)
             return False
         return True
 
@@ -102,6 +107,7 @@ class Player:
 
     def __init__(self):
         self.health = 500
+        self.max_health = 1000
         self.attack = 50
         self.x = 580
         self.y = 305
@@ -118,6 +124,7 @@ class Player:
             'boots': ''
         }
         self.items_inventory = [0, 0, 0]
+        self.level = 0
 
     def damage_taken(self, damage):
         """
@@ -126,8 +133,20 @@ class Player:
         :return: None
         """
         if not self.immortality:
-            self.health -= damage / 100 * (  # ?
-                    100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))
+            if tree.spell["Я есть грунт"]:
+                self.health -= damage / 100 * (  # ?
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor]) + 5))
+            elif tree.spell["Я терпила"] and self.health < 200:
+                self.health -= damage / 100 * (  # ?
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor]) + 15))
+            else:
+                self.health -= damage / 100 * (  # ?
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))
+            if tree.spell["Просвящённый"]:
+                monsters.hp -= damage * 0.25
+                self.health += damage * 0.1
+            if tree.spell["Сила майнкрфта"]:
+                monsters.hp -= damage * 0.1
             # получение урона
 
     def damage_given(self):  # Нанесение урона мобу
@@ -138,12 +157,22 @@ class Player:
         if self.attack_range():
             if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
                 if not self.immortality:
-                    monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                    if tree.spell["Вдохновляющий стяг"]:
+                        monsters.hp -= (self.attack + 50 +
+                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0)) * 1.1
+                    elif tree.spell["Светик-Сто-Смертник"]:
+                        monsters.hp -= (self.attack + 50 +
+                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0))
+                    else:
+                        monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
                 else:
                     monsters.hp -= 500
                 monsters.is_life()
-                player.timer = 300
-
+                if tree.spell["КДАБР"]:
+                    player.timer = 220
+                else:
+                    player.timer = 30
+                    
     def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
@@ -157,35 +186,45 @@ class Player:
         Перемещает персонажа по оси Х влево
         :return: None
         """
-        if self.x - 1 >= 0 and self.health > 0:
-            self.x -= 1
-            self.right = False
+        coof = 1
+        if tree.spell["Сапоги Гермеса"]:
+            coof = 2
+        if self.x - coof >= 0 and self.health > 0:
+            self.x -= coof
 
     def move_right(self):  # Движение игрока по карте
         """
         Перемещает персонажа по оси Х вправо
         :return: None
         """
-        if self.x + 1 <= 1160 and self.health > 0:
-            self.x += 1
-            self.right = True
+        coof = 1
+        if tree.spell["Сапоги Гермеса"]:
+            coof = 2
+        if self.x + coof <= 1160 and self.health > 0:
+            self.x += coof
 
     def move_down(self):  # Движение игрока по карте
         """
         Перемещает персонажа по оси У вниз
         :return: None
         """
-        if self.y + 1 <= 610 and self.health > 0:
-            self.y += 1
+        coof = 1
+        if tree.spell["Сапоги Гермеса"]:
+            coof = 2
+        if self.y + coof <= 610 and self.health > 0:
+            self.y += coof
 
     def move_up(self):  # Движение игрока по карте
         """
         Перемещает персонажа по оси У вверх
         :return: None
         """
+        coof = 1
+        if tree.spell["Сапоги Гермеса"]:
+            coof = 2
         if self.health > 0:
-            if self.y - 1 >= 0:
-                self.y -= 1
+            if self.y - coof >= 0:
+                self.y -= coof
 
     def move(self, key):
         pass  # ?
@@ -214,12 +253,12 @@ def draw_models():
     window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
-
+    
 def game_over():
     picture = pygame.image.load('images/game_over.jpg')
     window.blit(picture, (0, 0))
-
-
+    
+    
 width, height = 1280, 720
 
 player = Player()
@@ -250,10 +289,14 @@ potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 inventory_cell = pygame.image.load('images/inventory.gif')
 ui = UI(window, font, player)
 
+stop = "menu"
 inGame = False
 items = []
 run = True
 cycle = 0
+
+tree = SkillTree(player, window, font)
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -263,6 +306,7 @@ while run:
     mouse = pygame.mouse.get_pressed(5)
     clock = pygame.time.Clock()
     pygame.mouse.set_visible(False)
+    window.blit(background, (0, 0))  # фон
 
     if inGame:
         if key[pygame.K_d] and player.x < 1160:  # движение героя
@@ -291,8 +335,10 @@ while run:
             print('kill')
             del monsters
             if player.score >= 5000 and player.global_bosses == 0:
-                monsters = Monster('boss_eye')
+                monsters = Monster(boss_type='boss_eye')
                 player.global_bosses += 1
+            elif tree.spell["Звездочёт"] and random.choices([1, 0, 0, 0]):
+                monsters = Monster(speed=True)
             else:
                 monsters = Monster()
 
@@ -306,6 +352,11 @@ while run:
             # print(items[0])
 
         if key[pygame.K_ESCAPE]:
+            stop = "menu"
+            inGame = False
+
+        if key[pygame.K_p]:
+            stop = "level"
             inGame = False
 
         if key[pygame.K_f]:  # на f поднимать предмет (64 пикселя)
@@ -337,8 +388,6 @@ while run:
                 player.items_inventory[2] -= 1
                 bottle.use_heal()
 
-        window.blit(background, (0, 0))  # фон, монстр, игрок
-
         for dropped_item, pos, drop_cycle in items:
 
             dropped_item.blit_image(window, pos)
@@ -363,22 +412,31 @@ while run:
         ui.items_draw()
         ui.inventory_draw()
         ui.write_stats(monsters)
-
+        
         if player.health <= 0:
             game_over()
 
         clock.tick(300)
     else:
-        window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+        if stop == "menu":
+            window.blit(menu, (0, 0))  # меню игры, кнопки и тд
+
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    300 >= pygame.mouse.get_pos()[1] >= 240:
+                inGame = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    480 >= pygame.mouse.get_pos()[1] >= 400:
+                break
+        elif stop == "level":
+            skilltree = pygame.image.load('images/skilltree.png')
+            window.blit(skilltree, (0, 0))
+
+            if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
+                    450 >= pygame.mouse.get_pos()[1] >= 400:
+                inGame = True
+            tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                         pygame.mouse.get_pressed()[0])
         ui.set_cursor()
-
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                300 >= pygame.mouse.get_pos()[1] >= 240:
-            inGame = True
-        if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                480 >= pygame.mouse.get_pos()[1] >= 400:
-            break
-
     cycle += 1
     pygame.display.update()
 

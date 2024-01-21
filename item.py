@@ -55,6 +55,7 @@ class HealingBottle(Item):
         self.created = False
         self.stat = 100
 
+
     def is_created(self):
         """
         Возвращает True/False в зависимости от того выпало ли зелье
