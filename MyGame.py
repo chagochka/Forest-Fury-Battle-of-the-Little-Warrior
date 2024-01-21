@@ -43,7 +43,7 @@ class Monster:
         if speed:
             self.speed = 0
         else:
-            self.speed = self.monster_statistics[self.diff][-1]
+            self.speed = self.monster_statistics[self.diff][-2]
         self.right = True
         self.attack_range = self.monster_statistics[self.diff][3]
         self.texture = []
