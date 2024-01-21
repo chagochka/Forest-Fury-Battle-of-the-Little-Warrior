@@ -12,33 +12,40 @@ class Monster:
     Класс монстра
     """
 
-    def __init__(self, speed=False):
+    def __init__(self, speed=False, boss_type=None):
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
-            'low': [20, (100, 150), 0.7],  # атака, хп монстра
-            'medium': [50, (150, 200), 0.5],
-            'high': [75, (200, 250), 0.3],
-            'boss': [100, (250, 500), 0.3]
+            'low': [20, (100, 150), 0.7, 64],  # атака, хп монстра
+            'medium': [50, (150, 200), 0.5, 64],
+            'high': [75, (200, 250), 0.3, 64],
+            'boss': [100, (250, 500), 0.3, 64],
+            'boss_eye': [250, (2499, 2500), 0.25, 64]  # надо переделать под дальнюю атаку
         }
         self.timer = 0
         self.scores = {
             'low': 50,
             'medium': 100,
             'high': 150,
-            'boss': 200
+            'boss': 200,
+            'boss_eye': 500
+
         }
 
         self.x = random.randint(0, 1160)
         self.y = random.randint(0, 610)
-        self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
+        if boss_type is None:  # супер боссы
+            self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
+        else:
+            self.diff = boss_type
         self.atk = self.monster_statistics[self.diff][0]
-        self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][-1])
+        self.hp = random.randint(self.monster_statistics[self.diff][1][0], self.monster_statistics[self.diff][1][1])
         self.max_hp = self.hp
         if speed:
             self.speed = 0
         else:
             self.speed = self.monster_statistics[self.diff][-1]
         self.right = True
+        self.attack_range = self.monster_statistics[self.diff][3]
         self.texture = []
 
     def is_life(self):
@@ -88,12 +95,12 @@ class Monster:
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if player.attack_range() and self.hp > 0 >= self.timer and not player.immortality:
+        if player.attack_range(self.attack_range) and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
 
 
-class Player():
+class Player:
     """
     Класс игрока
     """
@@ -108,6 +115,7 @@ class Player():
         self.score = 0
         self.right = True
         self.immortality = False
+        self.global_bosses = 0
         self.inventory = {
             'sword': '',
             'helmet': '',
@@ -163,14 +171,15 @@ class Player():
                 if tree.spell["КДАБР"]:
                     player.timer = 220
                 else:
-                    player.timer = 300
-
-    def attack_range(self):  # радиус атаки
+                    player.timer = 30
+                    
+    def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
         :return: bool
         """
-        return -128 <= self.x - monsters.x <= 128 and -128 <= self.y - monsters.y <= 128
+        return (-attack_range <= self.x - monsters.x <= attack_range and
+                -attack_range <= self.y - monsters.y <= attack_range)
 
     def move_left(self):  # Движение игрока по карте
         """
@@ -244,11 +253,17 @@ def draw_models():
     window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
     # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
+    
+def game_over():
+    picture = pygame.image.load('images/game_over.jpg')
+    window.blit(picture, (0, 0))
+    
+    
 width, height = 1280, 720
 
 player = Player()
 monsters = Monster()
-bottle = HealingBottle()
+bottle = HealingBottle(pygame.image.load('images/potion.gif'), 'rare', 'potion')
 
 pygame.init()
 window = pygame.display.set_mode((width, height))
@@ -261,7 +276,8 @@ monster_textures = {
     'low': pygame.image.load('images/slither.gif'),
     'medium': pygame.image.load('images/spider.gif'),
     'high': pygame.image.load('images/knight.gif'),
-    'boss': pygame.image.load('images/boss.gif')
+    'boss': pygame.image.load('images/boss.gif'),
+    'boss_eye': pygame.image.load('images/boss_eye.gif')
 }
 
 font = pygame.font.Font('font/joystix.ttf', 18)
@@ -306,7 +322,7 @@ while run:
         if key[pygame.K_t]:
             print(monsters.timer)
         if key[pygame.K_j]:
-            player.immortality = True
+            player.immortality = not player.immortality
 
         monsters.monster_move()
         monsters.attack()
@@ -318,8 +334,11 @@ while run:
             bottle.drop(monsters.x, monsters.y)  # нужно сделать геттер
             print('kill')
             del monsters
-            if tree.spell["Звездочёт"] and random.choices([1, 0, 0, 0]):
-                monsters = Monster(True)
+            if player.score >= 5000 and player.global_bosses == 0:
+                monsters = Monster(boss_type='boss_eye')
+                player.global_bosses += 1
+            elif tree.spell["Звездочёт"] and random.choices([1, 0, 0, 0]):
+                monsters = Monster(speed=True)
             else:
                 monsters = Monster()
 
@@ -384,15 +403,18 @@ while run:
                     items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
 
         monsters.texture = monster_textures[monsters.diff]
-        window.blit(monsters.texture if monsters.right else transform.flip(monsters.texture, True, False) , (monsters.x, monsters.y))
-        monster = monster_textures[monsters.diff]
-        window.blit(monster if monsters.right else transform.flip(monster, True, False) , (monsters.x, monsters.y))
-        window.blit(player_model_right if player.right else player_model_left, (player.x, player.y))
+        indent = 128 if monsters.diff == 'boss_eye' else 64
+        window.blit(monsters.texture if monsters.right else transform.flip(monsters.texture, True, False),
+                    (monsters.x - indent, monsters.y - indent))
+        window.blit(player_model_right if player.right else player_model_left, (player.x - 64, player.y - 64))
         # загружаем модельку игрока и монстра смотрящую в ту сторону куда направлено движение (право лево)
 
         ui.items_draw()
         ui.inventory_draw()
         ui.write_stats(monsters)
+        
+        if player.health <= 0:
+            game_over()
 
         clock.tick(300)
     else:
