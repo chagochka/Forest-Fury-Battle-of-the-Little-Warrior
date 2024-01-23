@@ -154,9 +154,8 @@ class Player:
         Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча)
         :return: None
         """
-        if self.attack_range():
-            pygame.mixer.music.load(random.choice(hits))
-            if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
+        if monsters.hp > 0 >= player.timer and self.health >= 0:
+            if self.attack_range():
                 if not self.immortality:
                     if tree.spell["Вдохновляющий стяг"]:
                         monsters.hp -= (self.attack + 50 +
@@ -172,10 +171,11 @@ class Player:
                 if tree.spell["КДАБР"]:
                     player.timer = 220
                 else:
-                    player.timer = 30
-        else:
-            pygame.mixer.music.load(random.choice(misses))
-        pygame.mixer.music.play(0)
+                    player.timer = 300
+                pygame.mixer.music.load(random.choice(hits))
+            else:
+                pygame.mixer.music.load(random.choice(misses))
+            pygame.mixer.music.play(0)
     def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
