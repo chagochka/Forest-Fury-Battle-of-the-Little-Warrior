@@ -155,6 +155,7 @@ class Player:
         :return: None
         """
         if self.attack_range():
+            pygame.mixer.music.load(random.choice(hits))
             if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
                 if not self.immortality:
                     if tree.spell["Вдохновляющий стяг"]:
@@ -172,7 +173,9 @@ class Player:
                     player.timer = 220
                 else:
                     player.timer = 30
-                    
+        else:
+            pygame.mixer.music.load(random.choice(misses))
+        pygame.mixer.music.play(0)
     def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
@@ -286,6 +289,9 @@ menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
 fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
 skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')
 
+hits = ['sounds/hit1.wav', 'sounds/hit2.wav', 'sounds/hit3.wav']
+misses = ['sounds/miss1.wav', 'sounds/miss2.wav', 'sounds/miss3.wav']
+
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
 potion_model = pygame.image.load('images/potion.gif')
@@ -315,6 +321,7 @@ while run:
     if inGame:
         skills_theme.stop()
         menu_theme.stop()
+        fight_theme.set_volume(0.5)
         fight_theme.play()
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
