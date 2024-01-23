@@ -171,7 +171,7 @@ class Player:
                 if tree.spell["КДАБР"]:
                     player.timer = 220
                 else:
-                    player.timer = 30
+                    player.timer = 300
                     
     def attack_range(self, attack_range=128):  # радиус атаки
         """
