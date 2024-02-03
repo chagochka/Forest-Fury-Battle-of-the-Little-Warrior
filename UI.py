@@ -23,7 +23,7 @@ class UI:
 
 	# Отрисовка полоски здоровья игрока
 		pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
-		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
+		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 10, 20))
 		pygame.draw.rect(self.window, '#111111', (10, 10, 250, 20), 3)
 
 		# Отрисовка опыта

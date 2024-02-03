@@ -143,28 +143,35 @@ class Player:
                 self.health -= damage / 100 * (  # ?
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))
             if tree.spell["Просвящённый"]:
-                monsters.hp -= damage * 0.25
-                self.health += damage * 0.1
+                monsters.hp -= damage * 0.5
+                self.health += damage * 0.2
             if tree.spell["Сила майнкрфта"]:
-                monsters.hp -= damage * 0.1
+                monsters.hp -= damage * 0.3
             # получение урона
 
     def damage_given(self):  # Нанесение урона мобу
         """
-        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча)
+        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
         :return: None
         """
         if self.attack_range():
             if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
                 if not self.immortality:
                     if tree.spell["Вдохновляющий стяг"]:
-                        monsters.hp -= (self.attack + 50 +
+                        damage = (self.attack + 50 +
                                         (self.inventory['sword'].stat if self.inventory['sword'] else 0)) * 1.1
                     elif tree.spell["Светик-Сто-Смертник"]:
-                        monsters.hp -= (self.attack + 50 +
+                        damage = (self.attack + 50 +
                                         (self.inventory['sword'].stat if self.inventory['sword'] else 0))
                     else:
-                        monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                        damage = self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                    if tree.spell["Кровосися"]:
+                        self.health += damage * 0.05
+                        self.health_max_more()
+                    if tree.spell["Тёмное братство"] and random.randint(1, 5) == 4:
+                        monsters.hp -= damage * 1.5
+                    else:
+                        monsters.hp -= damage
                 else:
                     monsters.hp -= 500
                 monsters.is_life()
@@ -172,12 +179,24 @@ class Player:
                     player.timer = 220
                 else:
                     player.timer = 300
-                    
+
+    def health_max_more(self):
+        """
+        Ограничивает здоровье максимальным
+        :return: None
+        """
+        if self.health > self.max_health:
+            if tree.spell["Абаддон"]:
+                monsters.hp -= self.health - self.max_health
+            self.health = self.max_health
+
     def attack_range(self, attack_range=128):  # радиус атаки
         """
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
         :return: bool
         """
+        if tree.spell["Дуновение ветерка"]:
+            attack_range = 140
         return (-attack_range <= self.x - monsters.x <= attack_range and
                 -attack_range <= self.y - monsters.y <= attack_range)
 
@@ -188,9 +207,11 @@ class Player:
         """
         coof = 1
         if tree.spell["Сапоги Гермеса"]:
-            coof = 2
+            coof = 1.5
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
+            if tree.spell["Лечь костями"]:
+                self.health += 0.01
 
     def move_right(self):  # Движение игрока по карте
         """
@@ -199,9 +220,11 @@ class Player:
         """
         coof = 1
         if tree.spell["Сапоги Гермеса"]:
-            coof = 2
+            coof = 1.5
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
+            if tree.spell["Лечь костями"]:
+                self.health += 0.01
 
     def move_down(self):  # Движение игрока по карте
         """
@@ -210,9 +233,11 @@ class Player:
         """
         coof = 1
         if tree.spell["Сапоги Гермеса"]:
-            coof = 2
+            coof = 1.5
         if self.y + coof <= 610 and self.health > 0:
             self.y += coof
+            if tree.spell["Лечь костями"]:
+                self.health += 0.01
 
     def move_up(self):  # Движение игрока по карте
         """
@@ -221,10 +246,12 @@ class Player:
         """
         coof = 1
         if tree.spell["Сапоги Гермеса"]:
-            coof = 2
+            coof = 1.5
         if self.health > 0:
             if self.y - coof >= 0:
                 self.y -= coof
+                if tree.spell["Лечь костями"]:
+                    self.health += 0.01
 
     def move(self, key):
         pass  # ?
@@ -337,7 +364,7 @@ while run:
             if player.score >= 5000 and player.global_bosses == 0:
                 monsters = Monster(boss_type='boss_eye')
                 player.global_bosses += 1
-            elif tree.spell["Звездочёт"] and random.choices([1, 0, 0, 0]):
+            elif tree.spell["Звездочёт"] and random.randint(1, 5) == 4:
                 monsters = Monster(speed=True)
             else:
                 monsters = Monster()
@@ -358,6 +385,9 @@ while run:
         if key[pygame.K_p]:
             stop = "level"
             inGame = False
+
+        if key[pygame.K_o]:
+            tree.points += 1
 
         if key[pygame.K_f]:  # на f поднимать предмет (64 пикселя)
             try:
