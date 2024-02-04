@@ -374,6 +374,10 @@ while run:
     window.blit(background, (0, 0))  # фон
 
     if inGame:
+        skills_theme.stop()
+        menu_theme.stop()
+        fight_theme.set_volume(0.5)
+        fight_theme.play()
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
