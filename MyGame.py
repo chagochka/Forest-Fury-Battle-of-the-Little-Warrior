@@ -201,24 +201,17 @@ class Player(pygame.sprite.Sprite):
         Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
         :return: None
         """
-        if self.attack_range():
-            if monsters.hp > 0 >= player.timer and self.health >= 0:  # ?
+        if monsters.hp > 0 >= player.timer and self.health >= 0:
+            if self.attack_range():
                 if not self.immortality:
                     if tree.spell["Вдохновляющий стяг"]:
-                        damage = (self.attack + 50 +
+                        monsters.hp -= (self.attack + 50 +
                                         (self.inventory['sword'].stat if self.inventory['sword'] else 0)) * 1.1
                     elif tree.spell["Светик-Сто-Смертник"]:
-                        damage = (self.attack + 50 +
+                        monsters.hp -= (self.attack + 50 +
                                         (self.inventory['sword'].stat if self.inventory['sword'] else 0))
                     else:
-                        damage = self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
-                    if tree.spell["Кровосися"]:
-                        self.health += damage * 0.05
-                        self.health_max_more()
-                    if tree.spell["Тёмное братство"] and random.randint(1, 5) == 4:
-                        monsters.hp -= damage * 1.5
-                    else:
-                        monsters.hp -= damage
+                        monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
                 else:
                     monsters.hp -= 500
                 monsters.is_life()
@@ -226,6 +219,10 @@ class Player(pygame.sprite.Sprite):
                     player.timer = 220
                 else:
                     player.timer = 300
+                pygame.mixer.music.load(random.choice(hits))
+            else:
+                pygame.mixer.music.load(random.choice(misses))
+            pygame.mixer.music.play(0)
 
     def health_max_more(self):
         """
@@ -342,6 +339,13 @@ window = pygame.display.set_mode((width, height))
 pygame.display.set_caption('fight!')
 
 font = pygame.font.Font('font/joystix.ttf', 18)
+
+menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
+fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
+skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')
+
+hits = ['sounds/hit1.wav', 'sounds/hit2.wav', 'sounds/hit3.wav']
+misses = ['sounds/miss1.wav', 'sounds/miss2.wav', 'sounds/miss3.wav']
 
 background = pygame.image.load('images/background.jpg')
 menu = pygame.image.load('images/game_menu.jpg')
@@ -479,20 +483,26 @@ while run:
         clock.tick(300)
     else:
         if stop == "menu":
+            fight_theme.stop()
+            skills_theme.stop()
+            menu_theme.play()
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                    300 >= pygame.mouse.get_pos()[1] >= 240:
+                300 >= pygame.mouse.get_pos()[1] >= 240:
                 inGame = True
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                    480 >= pygame.mouse.get_pos()[1] >= 400:
+                480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
         elif stop == "level":
+            fight_theme.stop()
+            menu_theme.stop()
+            skills_theme.play()
             skilltree = pygame.image.load('images/skilltree.png')
             window.blit(skilltree, (0, 0))
 
             if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
-                    450 >= pygame.mouse.get_pos()[1] >= 400:
+                450 >= pygame.mouse.get_pos()[1] >= 400:
                 inGame = True
             tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                  pygame.mouse.get_pressed()[0])
