@@ -23,7 +23,7 @@ class UI:
 
 	# Отрисовка полоски здоровья игрока
 		pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
-		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 10, 20))
+		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
 		pygame.draw.rect(self.window, '#111111', (10, 10, 250, 20), 3)
 
 		# Отрисовка опыта
@@ -77,14 +77,14 @@ class UI:
 
 		else:
 			pygame.draw.rect(self.window, '#222222', (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
+				(monsters.x + 64) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
 				monsters.max_hp,
 				15))
 			pygame.draw.rect(self.window, (0, 150, 100), (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.hp / 2 - 64, monsters.y - 30 - 64, monsters.hp,
+				(monsters.x + 64) - monsters.hp / 2 - 64, monsters.y - 30 - 64, monsters.hp,
 				15))
 			pygame.draw.rect(self.window, '#111111', (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
+				(monsters.x + 64) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
 				monsters.max_hp,
 				15), 3)
 
