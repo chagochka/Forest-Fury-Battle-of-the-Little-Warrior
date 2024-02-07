@@ -21,7 +21,7 @@ class UI:
 		:return: None
 		"""
 
-		# Отрисовка полоски здоровья игрока
+	# Отрисовка полоски здоровья игрока
 		pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
 		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
 		pygame.draw.rect(self.window, '#111111', (10, 10, 250, 20), 3)
@@ -40,7 +40,14 @@ class UI:
 		self.window.blit(icon, (10, 40))
 		self.window.blit(defens, (50, 45))
 
+		boss_names = {  # имена боссов
+			'boss': 'DEMON',
+			'boss_eye': 'Ghost Eye'
+		}
+
 		# Отрисовка полоски здоровья моба
+
+		font = pygame.font.Font('font/joystix.ttf', 30)
 		if monsters.diff == 'boss':
 			pygame.draw.rect(self.window, '#222222', (
 				(self.window.get_width() / 2) - monsters.max_hp / 2, 10, monsters.max_hp, 20))
@@ -48,24 +55,45 @@ class UI:
 				(self.window.get_width() / 2) - monsters.hp / 2, 10, monsters.hp, 20))
 			pygame.draw.rect(self.window, '#111111', (
 				(self.window.get_width() / 2) - monsters.max_hp / 2, 10, monsters.max_hp, 20), 3)
-			font = pygame.font.Font('font/joystix.ttf', 30)
-			boss_text = font.render('DEMON', False, 'red')
+			boss_text = font.render(boss_names[monsters.diff], False, 'red')
 			self.window.blit(boss_text, (self.window.get_width() / 2 - boss_text.get_rect()[2] / 2, 40))
+
+		elif monsters.diff == 'boss_eye':
+			for i in range(monsters.max_hp // 500):
+				pygame.draw.rect(self.window, '#222222', (  # серый
+					(self.window.get_width() / 2) - monsters.max_hp / 2 // (monsters.max_hp // 500), 10 + i * 25,
+					monsters.max_hp // (monsters.max_hp // 500), 20))
+
+				pygame.draw.rect(self.window, (0, 150, 100), (  # зеленый
+					(self.window.get_width() / 2) - monsters.hp / 2 // (monsters.max_hp // 500), 10 + i * 25,
+					monsters.hp // (monsters.max_hp // 500), 20))
+
+				pygame.draw.rect(self.window, '#111111', (  # черный
+					(self.window.get_width() / 2) - monsters.max_hp / 2 // (monsters.max_hp // 500), 10 + i * 25,
+					monsters.max_hp // (monsters.max_hp // 500), 20), 3)
+
+			boss_text = font.render(boss_names[monsters.diff], False, 'red')
+			self.window.blit(boss_text, (self.window.get_width() / 2 - boss_text.get_rect()[2] / 2, 40))
+
 		else:
 			pygame.draw.rect(self.window, '#222222', (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2, monsters.y - 30, monsters.max_hp,
+				(monsters.x + 64) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
+				monsters.max_hp,
 				15))
 			pygame.draw.rect(self.window, (0, 150, 100), (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.hp / 2, monsters.y - 30, monsters.hp, 15))
+				(monsters.x + 64) - monsters.hp / 2 - 64, monsters.y - 30 - 64, monsters.hp,
+				15))
 			pygame.draw.rect(self.window, '#111111', (
-				(monsters.x + monsters.texture.get_width() / 2) - monsters.max_hp / 2, monsters.y - 30, monsters.max_hp,
+				(monsters.x + 64) - monsters.max_hp / 2 - 64, monsters.y - 30 - 64,
+				monsters.max_hp,
 				15), 3)
+
 
 	def inventory_draw(self):
 		"""
-		Рисует ячейки инвентаря и их содержимое
-		:return: None
-		"""
+			Рисует ячейки инвентаря и их содержимое
+			:return: None
+			"""
 		inventory_cell = pygame.image.load('images/inventory.gif')
 		potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 
@@ -84,6 +112,7 @@ class UI:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
 			self.window.blit(self.font.render(str(self.player.items_inventory[2]), True, (200, 200, 200)),
 			                 (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
+
 
 	def set_cursor(self):
 		self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
