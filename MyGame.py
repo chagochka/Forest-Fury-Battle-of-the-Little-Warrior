@@ -204,16 +204,18 @@ class Player(pygame.sprite.Sprite):
         if monsters.hp > 0 >= player.timer and self.health >= 0:
             if self.attack_range():
                 if not self.immortality:
+                    coof2 = 0
+                    coof1 = 1
                     if tree.spell["Вдохновляющий стяг"]:
-                        monsters.hp -= (self.attack + 50 +
-                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0)) * 1.1
+                        coof1 = 1.1
                     elif tree.spell["Светик-Сто-Смертник"]:
-                        monsters.hp -= (self.attack + 50 +
-                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0))
-                    else:
-                        monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                        coof2 = 50
+                    monsters.hp -= coof1 * (coof2 + self.attack
+                                            + (self.inventory['sword'].stat if self.inventory['sword'] else 0))
                 else:
                     monsters.hp -= 500
+                if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
+                    monsters.hp -= monsters.hp
                 monsters.is_life()
                 if tree.spell["КДАБР"]:
                     player.timer = 220
@@ -239,7 +241,7 @@ class Player(pygame.sprite.Sprite):
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
         :return: bool
         """
-        if tree.spell["Дуновение ветерка"]:
+        if tree.spell["Дуновение ветерка"]:  # Ослобляет игрока (не баг а фича)
             attack_range = 140
         return (-attack_range <= self.x - monsters.x <= attack_range and
                 -attack_range <= self.y - monsters.y <= attack_range)
@@ -250,12 +252,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(-coof, 0)
             self.right = False
 
@@ -265,12 +265,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(coof, 0)
             self.right = True
 
@@ -280,12 +278,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.y + coof <= 610 and self.health > 0:
             self.y += coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(0, coof)
 
     def move_up(self):  # Движение игрока по карте
@@ -294,13 +290,11 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.health > 0:
             if self.y - coof >= 0:
                 self.y -= coof
-                if tree.spell["Лечь костями"]:
-                    self.health += 0.01
+                if tree.spell["Сапоги Гермеса"]:
+                    self.health += 0.015
                 self.rect = self.rect.move(0, -coof)
 
     def find_item(self, x, y):
