@@ -175,7 +175,7 @@ class Player(pygame.sprite.Sprite):
 
     def damage_taken(self, damage):
         """
-        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60%)
+        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
         :param damage: int
         :return: None
         """
@@ -204,16 +204,18 @@ class Player(pygame.sprite.Sprite):
         if monsters.hp > 0 >= player.timer and self.health >= 0:
             if self.attack_range():
                 if not self.immortality:
+                    coof2 = 0
+                    coof1 = 1
                     if tree.spell["Вдохновляющий стяг"]:
-                        monsters.hp -= (self.attack + 50 +
-                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0)) * 1.1
+                        coof1 = 1.1
                     elif tree.spell["Светик-Сто-Смертник"]:
-                        monsters.hp -= (self.attack + 50 +
-                                        (self.inventory['sword'].stat if self.inventory['sword'] else 0))
-                    else:
-                        monsters.hp -= self.attack + (self.inventory['sword'].stat if self.inventory['sword'] else 0)
+                        coof2 = 50
+                    monsters.hp -= coof1 * (coof2 + self.attack
+                                            + (self.inventory['sword'].stat if self.inventory['sword'] else 0))
                 else:
                     monsters.hp -= 500
+                if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
+                    monsters.hp -= monsters.hp
                 monsters.is_life()
                 if tree.spell["КДАБР"]:
                     player.timer = 220
@@ -222,7 +224,7 @@ class Player(pygame.sprite.Sprite):
                 pygame.mixer.music.load(random.choice(hits))
             else:
                 pygame.mixer.music.load(random.choice(misses))
-            pygame.mixer.music.play(0)
+            """pygame.mixer.music.play(0)"""
 
     def health_max_more(self):
         """
@@ -239,7 +241,7 @@ class Player(pygame.sprite.Sprite):
         Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
         :return: bool
         """
-        if tree.spell["Дуновение ветерка"]:
+        if tree.spell["Дуновение ветерка"]:  # Ослобляет игрока (не баг а фича)
             attack_range = 140
         return (-attack_range <= self.x - monsters.x <= attack_range and
                 -attack_range <= self.y - monsters.y <= attack_range)
@@ -250,12 +252,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(-coof, 0)
             self.right = False
 
@@ -265,12 +265,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(coof, 0)
             self.right = True
 
@@ -280,12 +278,10 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.y + coof <= 610 and self.health > 0:
             self.y += coof
-            if tree.spell["Лечь костями"]:
-                self.health += 0.01
+            if tree.spell["Сапоги Гермеса"]:
+                self.health += 0.015
             self.rect = self.rect.move(0, coof)
 
     def move_up(self):  # Движение игрока по карте
@@ -294,13 +290,11 @@ class Player(pygame.sprite.Sprite):
         :return: None
         """
         coof = 1
-        if tree.spell["Сапоги Гермеса"]:
-            coof = 1.5
         if self.health > 0:
             if self.y - coof >= 0:
                 self.y -= coof
-                if tree.spell["Лечь костями"]:
-                    self.health += 0.01
+                if tree.spell["Сапоги Гермеса"]:
+                    self.health += 0.015
                 self.rect = self.rect.move(0, -coof)
 
     def find_item(self, x, y):
@@ -340,9 +334,9 @@ pygame.display.set_caption('fight!')
 
 font = pygame.font.Font('font/joystix.ttf', 18)
 
-menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
+'''menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
 fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
-skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')
+skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')'''
 
 hits = ['sounds/hit1.wav', 'sounds/hit2.wav', 'sounds/hit3.wav']
 misses = ['sounds/miss1.wav', 'sounds/miss2.wav', 'sounds/miss3.wav']
@@ -374,10 +368,10 @@ while run:
     window.blit(background, (0, 0))  # фон
 
     if inGame:
-        skills_theme.stop()
+        """skills_theme.stop()
         menu_theme.stop()
         fight_theme.set_volume(0.5)
-        fight_theme.play()
+        fight_theme.play()"""
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -402,7 +396,7 @@ while run:
             bottle.drop(monsters.x, monsters.y)  # нужно сделать геттер
             print('kill')
             monsters.kill()
-            if player.score >= 5000 and player.global_bosses == 0:
+            if player.score * player.global_bosses >= 5000 and player.global_bosses == 0:
                 monsters = Monster(boss_type='boss_eye')
                 player.global_bosses += 1
             elif tree.spell["Звездочёт"] and random.randint(1, 5) == 4:
@@ -487,9 +481,9 @@ while run:
         clock.tick(300)
     else:
         if stop == "menu":
-            fight_theme.stop()
+            """fight_theme.stop()
             skills_theme.stop()
-            menu_theme.play()
+            menu_theme.play()"""
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
@@ -499,9 +493,9 @@ while run:
                 480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
         elif stop == "level":
-            fight_theme.stop()
+            """fight_theme.stop()
             menu_theme.stop()
-            skills_theme.play()
+            skills_theme.play()"""
             skilltree = pygame.image.load('images/skilltree.png')
             window.blit(skilltree, (0, 0))
 
