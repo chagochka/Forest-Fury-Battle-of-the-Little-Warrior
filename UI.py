@@ -9,7 +9,7 @@ class UI:
 
 	def items_draw(self):
 		y = 64  # вывод снаряжения
-		for item in self.player.inventory.values():
+		for item in list(self.player.inventory.values())[:-1]:
 			if item:
 				self.window.blit(item.image, (self.window.get_width() - 64, y - 64))
 				self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
@@ -21,10 +21,10 @@ class UI:
 		:return: None
 		"""
 
-	# Отрисовка полоски здоровья игрока
-		pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
+		# Отрисовка полоски здоровья игрока
+		pygame.draw.rect(self.window, '#222222', (10, 10, self.player.max_health / 2, 20))
 		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
-		pygame.draw.rect(self.window, '#111111', (10, 10, 250, 20), 3)
+		pygame.draw.rect(self.window, '#111111', (10, 10, self.player.max_health / 2, 20), 3)
 
 		# Отрисовка опыта
 		text_surf = self.font.render(str(self.player.score), False, '#EEEEEE')
@@ -34,7 +34,7 @@ class UI:
 		self.window.blit(text_surf, text_rect)
 
 		# Отрисовка общей защиты
-		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:]])),
+		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:-1]])),
 		                          False, '#EEEEEE')
 		icon = pygame.image.load('images/armor.gif')
 		self.window.blit(icon, (10, 40))
@@ -88,31 +88,26 @@ class UI:
 				monsters.max_hp,
 				15), 3)
 
-
 	def inventory_draw(self):
 		"""
-			Рисует ячейки инвентаря и их содержимое
-			:return: None
-			"""
+		Рисует ячейки инвентаря и их содержимое
+		:return: None
+		"""
 		inventory_cell = pygame.image.load('images/inventory.gif')
 		potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
-		if self.player.items_inventory[0]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[0]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 - 96 + 48, self.window.get_height() - 64 + 32))
-		if self.player.items_inventory[1]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[1]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 - 32 + 48, self.window.get_height() - 64 + 32))
-		if self.player.items_inventory[2]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[2]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
+		x1 = -128
+		for i in range(3):
+			self.window.blit(inventory_cell, (self.window.get_width() // 2 + x1, self.window.get_height() - 64))
+			x1 += 64
 
+		x2 = -128
+		for bot in self.player.inventory['potion']:
+			self.window.blit(potion_inventory, (self.window.get_width() // 2 + x2, self.window.get_height() - 64))
+			stat = self.font.render(str(bot.stat), True, (200, 200, 200))
+			self.window.blit(stat, (
+				self.window.get_width() // 2 + x2 + (32 - stat.get_height()), self.window.get_height() - 64 + 32))
+			x2 += 64
 
 	def set_cursor(self):
 		self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
