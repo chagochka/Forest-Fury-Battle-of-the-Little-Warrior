@@ -90,9 +90,9 @@ class UI:
 
 	def inventory_draw(self):
 		"""
-			Рисует ячейки инвентаря и их содержимое
-			:return: None
-			"""
+		Рисует ячейки инвентаря и их содержимое
+		:return: None
+		"""
 		inventory_cell = pygame.image.load('images/inventory.gif')
 		potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
 
