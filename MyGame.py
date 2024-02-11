@@ -224,7 +224,7 @@ class Player(pygame.sprite.Sprite):
                 pygame.mixer.music.load(random.choice(hits))
             else:
                 pygame.mixer.music.load(random.choice(misses))
-            """pygame.mixer.music.play(0)"""
+            pygame.mixer.music.play(0)
 
     def health_max_more(self):
         """
@@ -334,9 +334,9 @@ pygame.display.set_caption('fight!')
 
 font = pygame.font.Font('font/joystix.ttf', 18)
 
-'''menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
+menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
 fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
-skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')'''
+skills_theme = pygame.mixer.Sound('sounds/Who Are You.wav')
 
 hits = ['sounds/hit1.wav', 'sounds/hit2.wav', 'sounds/hit3.wav']
 misses = ['sounds/miss1.wav', 'sounds/miss2.wav', 'sounds/miss3.wav']
@@ -368,10 +368,10 @@ while run:
     window.blit(background, (0, 0))  # фон
 
     if inGame:
-        """skills_theme.stop()
+        skills_theme.stop()
         menu_theme.stop()
         fight_theme.set_volume(0.5)
-        fight_theme.play()"""
+        fight_theme.play()
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -481,9 +481,9 @@ while run:
         clock.tick(300)
     else:
         if stop == "menu":
-            """fight_theme.stop()
+            fight_theme.stop()
             skills_theme.stop()
-            menu_theme.play()"""
+            menu_theme.play()
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
@@ -493,9 +493,9 @@ while run:
                 480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
         elif stop == "level":
-            """fight_theme.stop()
+            fight_theme.stop()
             menu_theme.stop()
-            skills_theme.play()"""
+            skills_theme.play()
             skilltree = pygame.image.load('images/skilltree.png')
             window.blit(skilltree, (0, 0))
 
