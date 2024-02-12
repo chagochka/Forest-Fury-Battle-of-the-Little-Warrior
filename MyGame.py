@@ -37,7 +37,7 @@ class Monster(pygame.sprite.Sprite):
             'medium': [50, (150, 200), 0.5, 64],
             'high': [75, (200, 250), 0.3, 64],
             'boss': [100, (250, 500), 0.3, 64],
-            'boss_eye': [50, (2499, 2500), 0.25, 1]  # надо переделать под дальнюю атаку
+            'boss_eye': [200, (2499, 2500), 0.25, 64]  # надо переделать под дальнюю атаку
         }
         self.timer = 0
         self.scores = {
@@ -81,22 +81,36 @@ class Monster(pygame.sprite.Sprite):
 
     def is_life(self):
         """
-        Проверка живой ли монстр, если нет то выпадает дроп
-        :return: bool
-        """
+		Проверка живой ли монстр, если нет то выпадает дроп
+		:return: bool
+		"""
         if self.hp <= 0:
-            item_type = random.choices([Weapon, Armor], weights=[1, 4])[0]
+            types = [Weapon, Armor]
+            weights = [1, 3]
+            if len(player.inventory['potion']) < 3:
+                types = [Weapon, Armor, HealingBottle]
+                weights.append(2)
+
+            item_type = random.choices(types, weights=weights)[0]
             rar = random.choices(Item.rarities, weights=[5, 4, 3, 2, 1])[0]
+
             if self.diff == 'boss':
                 rar = 'legendary'
             if item_type == Weapon:
-                items.append((Weapon(pygame.image.load(f'images/{rar}_sword.gif'), rar, 'sword'),
-                              (self.x, self.y), cycle))
+                items.append((
+                    Weapon(pygame.image.load(f'images/{rar}_sword.gif'), rar, 'sword'),
+                    (self.x, self.y), cycle))
+            elif item_type == HealingBottle:
+                rar = random.choices(HealingBottle.rarities, weights=[3, 2, 1])[0]
+                items.append((
+                    HealingBottle(pygame.image.load('images/potion.gif'), rar, 'potion'),
+                    (self.x, self.y), cycle))
             else:
                 armor_type = random.choice(['boots', 'trousers', 'helmet', 'breastplate'])
 
-                items.append((Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
-                              (self.x, self.y), cycle))
+                items.append((
+                    Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
+                    (self.x, self.y), cycle))
             player.score += self.scores[self.diff]
             tree.point(player.score)
             return False
@@ -127,7 +141,7 @@ class Monster(pygame.sprite.Sprite):
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if (player.attack_range(self.attack_range) or pygame.sprite.collide_mask(self, player))\
+        if (player.attack_range(self.attack_range) or pygame.sprite.collide_mask(self, player)) \
                 and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
@@ -191,7 +205,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(group_sprites)
         self.health = 500
-        self.max_health = 1000
+        self.max_health = 500
         self.attack = 50
         self.x = 580
         self.y = 305
@@ -201,13 +215,13 @@ class Player(pygame.sprite.Sprite):
         self.immortality = False
         self.global_bosses = 0
         self.inventory = {
-            'sword': '',
-            'helmet': '',
-            'breastplate': '',
-            'trousers': '',
-            'boots': ''
+            'sword': Item('', '', 'empty'),
+            'helmet': Item('', '', 'empty'),
+            'breastplate': Item('', '', 'empty'),
+            'trousers': Item('', '', 'empty'),
+            'boots': Item('', '', 'empty'),
+            'potion': []
         }
-        self.items_inventory = [0, 0, 0]
         self.level = 0
 
         self.image = load_image('ninja.gif')
@@ -217,34 +231,33 @@ class Player(pygame.sprite.Sprite):
 
     def damage_taken(self, damage):
         """
-        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
-        :param damage: int
-        :return: None
-        """
+		Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
+		:param damage: int
+		:return: None
+		"""
         if not self.immortality:
             if tree.spell["Я есть грунт"]:
                 self.health -= damage / 100 * (  # ?
-                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor]) + 5))
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 5))
             elif tree.spell["Я терпила"] and self.health < 200:
                 self.health -= damage / 100 * (  # ?
-                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor]) + 15))
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 15))
             else:
                 self.health -= damage / 100 * (  # ?
-                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:] if armor])))
+                        100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]])))
             if tree.spell["Просвящённый"]:
                 monsters.hp -= damage * 0.5
                 self.health += damage * 0.2
             if tree.spell["Сила майнкрфта"]:
                 monsters.hp -= damage * 0.3
-            # получение урона
 
     def damage_given(self):  # Нанесение урона мобу
         """
-        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
-        :return: None
-        """
+		Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
+		:return: None
+		"""
         if monsters.hp > 0 >= player.timer and self.health >= 0:
-            if self.attack_range() or pygame.sprite.collide_mask(self, monsters):
+            if self.attack_range():
                 if not self.immortality:
                     coof2 = 0
                     coof1 = 1
@@ -252,8 +265,7 @@ class Player(pygame.sprite.Sprite):
                         coof1 = 1.1
                     elif tree.spell["Светик-Сто-Смертник"]:
                         coof2 = 50
-                    monsters.hp -= coof1 * (coof2 + self.attack
-                                            + (self.inventory['sword'].stat if self.inventory['sword'] else 0))
+                    monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
                 else:
                     monsters.hp -= 500
                 if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
@@ -365,10 +377,8 @@ width, height = 1280, 720
 
 group_sprites = pygame.sprite.Group()
 
-
 monsters = Monster()
 player = Player()
-bottle = HealingBottle(pygame.image.load('images/potion.gif'), 'rare', 'potion')
 
 pygame.init()
 window = pygame.display.set_mode((width, height))
@@ -402,6 +412,9 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if inGame and event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+            if player.inventory['potion']:
+                player.inventory['potion'].pop().heal(player)
 
     key = pygame.key.get_pressed()
     mouse = pygame.mouse.get_pressed(5)
@@ -414,7 +427,6 @@ while run:
         menu_theme.stop()
         fight_theme.set_volume(0.01)
         fight_theme.play()
-
         if key[pygame.K_d] and player.x < 1160:  # движение героя
             player.move_right()
         if key[pygame.K_s] and player.y < 610:
@@ -425,19 +437,14 @@ while run:
             player.move_up()
         if key[pygame.K_e] or mouse[0]:
             player.damage_given()
-        if key[pygame.K_t]:
-            print(monsters.timer)
         if key[pygame.K_j]:
             player.immortality = not player.immortality
 
         monsters.attack()
         monsters.timer -= 1
         player.timer -= 1
-        bottle.timer -= 1
 
         if monsters.hp <= 0 and monsters.timer <= 0:
-            bottle.drop(monsters.x, monsters.y)  # нужно сделать геттер
-            print('kill')
             monsters.kill()
             if player.score // 5000 != player.global_bosses:
                 monsters = GlobalBoss()
@@ -457,10 +464,6 @@ while run:
         if key[pygame.K_0]:
             player.score += 30
 
-        if key[pygame.K_i]:
-            print(player.items_inventory)
-            # print(items[0])
-
         if key[pygame.K_o]:
             tree.points += 1
 
@@ -472,24 +475,6 @@ while run:
             stop = "level"
             inGame = False
 
-        if key[pygame.K_1]:
-            if bottle.can_use() and player.items_inventory[0] and player.health > 0:
-                player.health += 50
-                player.items_inventory[0] -= 1
-                bottle.use_heal()
-
-        if key[pygame.K_2]:
-            if bottle.can_use() and player.items_inventory[1] and player.health > 0:
-                player.health += 75
-                player.items_inventory[1] -= 1
-                bottle.use_heal()
-
-        if key[pygame.K_3]:
-            if bottle.can_use() and player.items_inventory[2] and player.health > 0:
-                player.health += 100
-                player.items_inventory[2] -= 1
-                bottle.use_heal()
-
         for dropped_item, pos, drop_cycle in items:
 
             dropped_item.blit_image(window, pos)
@@ -497,12 +482,15 @@ while run:
             if cycle - drop_cycle == 1000:
                 items.pop(items.index((dropped_item, pos, drop_cycle)))  # удаление предметов с земли
 
-            if (key[pygame.K_f]) or (
-                    abs(player.x - pos[0]) <= 50 and abs(player.y - pos[1] <= 50) and (not player.inventory[
-                dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat)):
-                if player.find_item(pos[0], pos[1]):
+            if isinstance(dropped_item, HealingBottle):
+                if player.find_item(pos[0], pos[1]) and len(player.inventory['potion']) < 3:
+                    player.inventory['potion'].append(dropped_item)
+                    items.pop(items.index((dropped_item, pos, drop_cycle)))
+            else:
+                if (key[pygame.K_f]) or (player.find_item(pos[0], pos[1]) and (not player.inventory[
+                    dropped_item.type] or dropped_item.stat > player.inventory[dropped_item.type].stat)):
                     player.inventory[dropped_item.type] = dropped_item
-                    items.pop(items.index((dropped_item, pos, drop_cycle)))  # ?
+                    items.pop(items.index((dropped_item, pos, drop_cycle)))
 
         ui.items_draw()
         ui.inventory_draw()
@@ -527,10 +515,10 @@ while run:
             window.blit(menu, (0, 0))  # меню игры, кнопки и тд
 
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                300 >= pygame.mouse.get_pos()[1] >= 240:
+                    300 >= pygame.mouse.get_pos()[1] >= 240:
                 inGame = True
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
-                480 >= pygame.mouse.get_pos()[1] >= 400:
+                    480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
         elif stop == "level":
             fight_theme.stop()
@@ -540,7 +528,7 @@ while run:
             window.blit(skilltree, (0, 0))
 
             if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
-                450 >= pygame.mouse.get_pos()[1] >= 400:
+                    450 >= pygame.mouse.get_pos()[1] >= 400:
                 inGame = True
             tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                  pygame.mouse.get_pressed()[0])

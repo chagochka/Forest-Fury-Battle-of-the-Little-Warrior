@@ -12,6 +12,7 @@ class Item:
         self.image = image
         self.rarity = rarity
         self.type = item_type
+        self.stat = 0
 
     def blit_image(self, window, pos):
         window.blit(self.image, pos)
@@ -49,41 +50,20 @@ class Armor(Item):
 class HealingBottle(Item):
     """Класс зелья здоровья"""
 
+    rarities = ['uncommon', 'mythical', 'legendary']
+    stats = {
+        'uncommon': 25,
+        'mythical': 50,
+        'legendary': 100
+    }
+
     def __init__(self, image, rarity, item_type):
         super().__init__(image, rarity, item_type)
-        self.timer = 0
-        self.created = False
-        self.stat = 100
+        self.stat = self.stats[rarity]
+        self.rarity = rarity
 
-
-    def is_created(self):
-        """
-        Возвращает True/False в зависимости от того выпало ли зелье
-        :return: bool
-        """
-        return self.created
-
-    def drop(self, x, y):
-        """
-        Устанавливает координаты и рандомно выбирает количество лечения
-        :param x: int
-        :param y: int
-        :return: None
-        """
-        self.created = True
-        self.cords = (x, y)
-        self.heal = random.choices([50, 75, 100], weights=[5, 3, 1], k=1)[0]
-
-    def use_heal(self):
-        """
-        Устанавливает таймер на использование
-        :return: None
-        """
-        self.timer = 300
-
-    def can_use(self):
-        """
-        Возвращает True/False в зависимости от того можно ли использовать зелье
-        :return:
-        """
-        return self.timer <= 0
+    def heal(self, player):
+        if player.health + self.stat < 1000:
+            if player.health + self.stat > player.max_health:
+                player.max_health += player.health + self.stat - player.max_health
+            player.health += self.stat
