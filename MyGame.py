@@ -83,8 +83,15 @@ class Monster(pygame.sprite.Sprite):
 		:return: bool
 		"""
 		if self.hp <= 0:
-			item_type = random.choices([Weapon, Armor, HealingBottle], weights=[1, 3, 4])[0]
+			types = [Weapon, Armor]
+			weights = [1, 3]
+			if len(player.inventory['potion']) < 3:
+				types = [Weapon, Armor, HealingBottle]
+				weights.append(2)
+
+			item_type = random.choices(types, weights=weights)[0]
 			rar = random.choices(Item.rarities, weights=[5, 4, 3, 2, 1])[0]
+
 			if self.diff == 'boss':
 				rar = 'legendary'
 			if item_type == Weapon:
@@ -92,8 +99,9 @@ class Monster(pygame.sprite.Sprite):
 					Weapon(pygame.image.load(f'images/{rar}_sword.gif'), rar, 'sword'),
 					(self.x, self.y), cycle))
 			elif item_type == HealingBottle:
+				rar = random.choices(HealingBottle.rarities, weights=[3, 2, 1])[0]
 				items.append((
-					HealingBottle(pygame.image.load('images/potion.gif'), 'uncommon', 'potion'),
+					HealingBottle(pygame.image.load('images/potion.gif'), rar, 'potion'),
 					(self.x, self.y), cycle))
 			else:
 				armor_type = random.choice(['boots', 'trousers', 'helmet', 'breastplate'])
@@ -163,11 +171,11 @@ class Player(pygame.sprite.Sprite):
 		self.immortality = False
 		self.global_bosses = 0
 		self.inventory = {
-			'sword': '',
-			'helmet': '',
-			'breastplate': '',
-			'trousers': '',
-			'boots': '',
+			'sword': Item('', '', 'empty'),
+			'helmet': Item('', '', 'empty'),
+			'breastplate': Item('', '', 'empty'),
+			'trousers': Item('', '', 'empty'),
+			'boots': Item('', '', 'empty'),
 			'potion': []
 		}
 		self.level = 0
@@ -186,13 +194,13 @@ class Player(pygame.sprite.Sprite):
 		if not self.immortality:
 			if tree.spell["Я есть грунт"]:
 				self.health -= damage / 100 * (  # ?
-					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1] if armor]) + 5))
+					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 5))
 			elif tree.spell["Я терпила"] and self.health < 200:
 				self.health -= damage / 100 * (  # ?
-					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1] if armor]) + 15))
+					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 15))
 			else:
 				self.health -= damage / 100 * (  # ?
-					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1] if armor])))
+					100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]])))
 			if tree.spell["Просвящённый"]:
 				monsters.hp -= damage * 0.5
 				self.health += damage * 0.2
@@ -215,8 +223,7 @@ class Player(pygame.sprite.Sprite):
 						coof1 = 1.1
 					elif tree.spell["Светик-Сто-Смертник"]:
 						coof2 = 50
-					monsters.hp -= coof1 * (coof2 + self.attack + (
-						self.inventory['sword'].stat if self.inventory['sword'] else 0))
+					monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
 				else:
 					monsters.hp -= 500
 				if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
@@ -330,7 +337,6 @@ group_sprites = pygame.sprite.Group()
 
 monsters = Monster()
 player = Player()
-bottle = HealingBottle(pygame.image.load('images/potion.gif'), 'rare', 'potion')
 
 pygame.init()
 window = pygame.display.set_mode((width, height))

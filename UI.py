@@ -10,7 +10,7 @@ class UI:
 	def items_draw(self):
 		y = 64  # вывод снаряжения
 		for item in list(self.player.inventory.values())[:-1]:
-			if item:
+			if item.image:
 				self.window.blit(item.image, (self.window.get_width() - 64, y - 64))
 				self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
 			y += 64
@@ -106,7 +106,7 @@ class UI:
 			self.window.blit(potion_inventory, (self.window.get_width() // 2 + x2, self.window.get_height() - 64))
 			stat = self.font.render(str(bot.stat), True, (200, 200, 200))
 			self.window.blit(stat, (
-				self.window.get_width() // 2 + x2 + (32 - stat.get_height()), self.window.get_height() - 64 + 32))
+				self.window.get_width() // 2 + x2 + (32 - stat.get_width() / 2), self.window.get_height() - 64 + 32))
 			x2 += 64
 
 	def set_cursor(self):

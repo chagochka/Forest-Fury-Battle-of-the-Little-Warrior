@@ -12,6 +12,7 @@ class Item:
         self.image = image
         self.rarity = rarity
         self.type = item_type
+        self.stat = 0
 
     def blit_image(self, window, pos):
         window.blit(self.image, pos)
@@ -49,9 +50,16 @@ class Armor(Item):
 class HealingBottle(Item):
     """Класс зелья здоровья"""
 
+    rarities = ['uncommon', 'mythical', 'legendary']
+    stats = {
+        'uncommon': 25,
+        'mythical': 50,
+        'legendary': 100
+    }
+
     def __init__(self, image, rarity, item_type):
         super().__init__(image, rarity, item_type)
-        self.stat = 100
+        self.stat = self.stats[rarity]
 
     def heal(self, player):
         if player.health + self.stat < 1000:
