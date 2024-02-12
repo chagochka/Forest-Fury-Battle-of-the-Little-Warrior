@@ -95,9 +95,18 @@ class UI:
 		"""
 		inventory_cell = pygame.image.load('images/inventory.gif')
 		potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
+		rarity_colors = {
+			'uncommon': 'gray',
+			'mythical': 'purple',
+			'legendary': 'yellow'
+		}
 
 		x1 = -128
 		for i in range(3):
+			if len(self.player.inventory['potion']) == i + 1 and self.player.inventory['potion'][i]:
+				pygame.draw.rect(
+					self.window, rarity_colors[self.player.inventory['potion'][i].rarity],
+					(self.window.get_width() // 2 + x1, self.window.get_height() - 64, 64, 64))
 			self.window.blit(inventory_cell, (self.window.get_width() // 2 + x1, self.window.get_height() - 64))
 			x1 += 64
 

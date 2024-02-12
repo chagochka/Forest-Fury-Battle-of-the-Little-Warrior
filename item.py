@@ -60,6 +60,7 @@ class HealingBottle(Item):
     def __init__(self, image, rarity, item_type):
         super().__init__(image, rarity, item_type)
         self.stat = self.stats[rarity]
+        self.rarity = rarity
 
     def heal(self, player):
         if player.health + self.stat < 1000:
