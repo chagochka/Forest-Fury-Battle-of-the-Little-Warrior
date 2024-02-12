@@ -103,7 +103,7 @@ class UI:
 
 		x1 = -128
 		for i in range(3):
-			if len(self.player.inventory['potion']) == i + 1 and self.player.inventory['potion'][i]:
+			if len(self.player.inventory['potion']) >= i + 1 and self.player.inventory['potion'][i]:
 				pygame.draw.rect(
 					self.window, rarity_colors[self.player.inventory['potion'][i].rarity],
 					(self.window.get_width() // 2 + x1, self.window.get_height() - 64, 64, 64))
