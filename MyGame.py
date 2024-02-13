@@ -231,10 +231,10 @@ class Player(pygame.sprite.Sprite):
 
     def damage_taken(self, damage):
         """
-		Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
-		:param damage: int
-		:return: None
-		"""
+		    Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
+		    :param damage: int
+		    :return: None
+		    """
         if not self.immortality:
             if tree.spell["Я есть грунт"]:
                 self.health -= damage / 100 * (  # ?
@@ -372,7 +372,7 @@ def game_over():
     picture = pygame.image.load('images/game_over.jpg')
     window.blit(picture, (0, 0))
 
-
+    
 width, height = 1280, 720
 
 group_sprites = pygame.sprite.Group()
