@@ -402,6 +402,7 @@ ui = UI(window, font, player)
 
 stop = "menu"
 inGame = False
+in_settings = False
 items = []
 run = True
 cycle = 0
@@ -506,7 +507,15 @@ while run:
         if player.health <= 0:
             game_over()
 
+        cycle += 1
         clock.tick(300)
+    elif in_settings:
+        fight_theme.stop()
+        skills_theme.stop()
+        menu_theme.play()
+
+        ui.open_settings_window()
+        ui.set_cursor()
     else:
         if stop == "menu":
             fight_theme.stop()
@@ -517,6 +526,9 @@ while run:
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                     300 >= pygame.mouse.get_pos()[1] >= 240:
                 inGame = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                390 >= pygame.mouse.get_pos()[1] >= 320:
+                in_settings = True
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                     480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
@@ -533,7 +545,6 @@ while run:
             tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
                                  pygame.mouse.get_pressed()[0])
         ui.set_cursor()
-    cycle += 1
     pygame.display.update()
 
 pygame.quit()

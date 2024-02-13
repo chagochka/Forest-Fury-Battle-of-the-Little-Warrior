@@ -120,3 +120,6 @@ class UI:
 
 	def set_cursor(self):
 		self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
+
+	def open_settings_window(self):
+		self.window.blit(pygame.image.load('images/settings_menu.png'), (0, 0))
