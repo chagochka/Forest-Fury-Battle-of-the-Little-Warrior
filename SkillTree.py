@@ -96,6 +96,30 @@ class SkillTree:
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
         self.window.blit(text_surf, text_rect)
+        # вывод статистики
+        text_surf = self.font.render(f"Убито монстров: {str(self.player.kill)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(900, 50))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Весь урона: {str(self.player.all_damage)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(900, 100))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Урона монстров: {str(self.player.all_mob_damage)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(900, 150))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Общее исцеление: {str(self.player.all_hael)}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(900, 200))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
 
     def cursor_location(self, coor, clic):
         x, y = coor

@@ -112,6 +112,7 @@ class Monster(pygame.sprite.Sprite):
                     Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
                     (self.x, self.y), cycle))
             player.score += self.scores[self.diff]
+            player.kill += 1
             tree.point(player.score)
             return False
         return True
@@ -224,6 +225,11 @@ class Player(pygame.sprite.Sprite):
         }
         self.level = 0
 
+        self.kill = 0
+        self.all_damage = 0
+        self.all_mob_damage = 0
+        self.all_hael = 0
+
         self.image = load_image('ninja.gif')
         self.images = [load_image('ninja.gif'), pygame.transform.flip(self.image, True, False)]
         self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
@@ -231,50 +237,59 @@ class Player(pygame.sprite.Sprite):
 
     def damage_taken(self, damage):
         """
-		Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
-	    :param damage: int
-	    :return: None
-	    """
+        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
+        :param damage: int
+        :return: None
+        """
         if not self.immortality:
             if tree.spell["Я есть грунт"]:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (  # ?
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 5))
             elif tree.spell["Я терпила"] and self.health < 200:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (  # ?
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 15))
             else:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (  # ?
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]])))
+            self.health -= coof
+            self.all_mob_damage += coof
             if tree.spell["Просвящённый"]:
                 monsters.hp -= damage * 0.5
+                self.all_damage += damage * 0.5
                 self.health += damage * 0.2
+                self.all_hael += damage * 0.2
             if tree.spell["Сила майнкрфта"]:
                 monsters.hp -= damage * 0.3
+                self.all_damage += damage * 0.3
 
     def damage_given(self):  # Нанесение урона мобу
         """
-		Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
-		:return: None
-		"""
+        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
+        :return: None
+        """
         if monsters.hp > 0 >= player.timer and self.health >= 0:
             if self.attack_range():
-                if not self.immortality:
-                    coof2 = 0
-                    coof1 = 1
-                    if tree.spell["Вдохновляющий стяг"]:
-                        coof1 = 1.1
-                    elif tree.spell["Светик-Сто-Смертник"]:
-                        coof2 = 50
-                    monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
-                else:
-                    monsters.hp -= 500
+                coof2 = 0
+                coof1 = 1
+                if tree.spell["Вдохновляющий стяг"]:
+                    coof1 = 1.1
+                elif tree.spell["Светик-Сто-Смертник"]:
+                    coof2 = 50
+                elif self.immortality:
+                    coof2 = 500
+                monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
+                self.all_damage += coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
+                if tree.spell["Кровосися"]:
+                    self.health += (coof1 * (coof2 + self.attack + self.inventory['sword'].stat)) * 0.05
                 if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
                     monsters.hp -= monsters.hp
+                    self.all_damage += monsters.hp
                 monsters.is_life()
                 if tree.spell["КДАБР"]:
                     player.timer = 220
                 else:
                     player.timer = 300
+                self.health_max_more()
                 pygame.mixer.music.load(random.choice(hits))
             else:
                 pygame.mixer.music.load(random.choice(misses))
@@ -288,6 +303,7 @@ class Player(pygame.sprite.Sprite):
         if self.health > self.max_health:
             if tree.spell["Абаддон"]:
                 monsters.hp -= self.health - self.max_health
+                self.all_damage += self.health - self.max_health
             self.health = self.max_health
 
     def attack_range(self, attack_range=128):  # радиус атаки
@@ -309,7 +325,7 @@ class Player(pygame.sprite.Sprite):
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
+                self.health += 0.01
             self.rect = self.rect.move(-coof, 0)
             self.right = False
 
@@ -322,7 +338,7 @@ class Player(pygame.sprite.Sprite):
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
+                self.health += 0.01
             self.rect = self.rect.move(coof, 0)
             self.right = True
 
@@ -335,7 +351,7 @@ class Player(pygame.sprite.Sprite):
         if self.y + coof <= 610 and self.health > 0:
             self.y += coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
+                self.health += 0.01
             self.rect = self.rect.move(0, coof)
 
     def move_up(self):  # Движение игрока по карте
@@ -348,7 +364,7 @@ class Player(pygame.sprite.Sprite):
             if self.y - coof >= 0:
                 self.y -= coof
                 if tree.spell["Сапоги Гермеса"]:
-                    self.health += 0.015
+                    self.health += 0.01
                 self.rect = self.rect.move(0, -coof)
 
     def find_item(self, x, y):
