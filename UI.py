@@ -1,5 +1,6 @@
-import pygame
 import csv
+
+import pygame
 
 
 class UI:
@@ -124,6 +125,7 @@ class UI:
 
 	def open_settings_window(self):
 		self.window.blit(pygame.image.load('images/settings_menu.png'), (0, 0))
+		font = pygame.font.Font('font/joystix.ttf', 40)
 		cords = []
 
 		with open('binds.csv', encoding="utf8") as csvfile:
@@ -131,8 +133,8 @@ class UI:
 
 		y = 170
 		for bind in self.binds[1]:
-			font = pygame.font.Font('font/joystix.ttf', 40 if len(bind) == 1 else 20)
 			button = font.render(bind.replace('.', ' ').upper(), False, 'white')
+
 			self.window.blit(button, (300, y))
 			cords.append(
 				(300, y, 300 + button.get_width(), y + button.get_height(), bind))
@@ -140,8 +142,9 @@ class UI:
 
 		return cords
 
-	def change_bind(self, bind):
+	def change_bind(self, latest_bind, new_bind):
 		with open('binds.csv', 'w', newline='', encoding="utf8") as csvfile:
 			writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 			writer.writerow(self.binds[0])
-			writer.writerow(' '.join(self.binds[1]).replace(bind, 'Нажмите.нужную.кнопку.на.клавиатуре').split())
+			self.binds[1][self.binds[1].index(latest_bind)] = new_bind
+			writer.writerow(self.binds[1])
