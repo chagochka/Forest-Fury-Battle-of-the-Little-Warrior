@@ -107,15 +107,18 @@ class SkillTree:
             if x1 < x < y1 and x2 < y < y2 and clic:
                 self.title = self.spells[num]
                 self.description = self.descriptions[self.spells[num]]
-            if 300 < x < 420 and 280 < y < 310 and clic:
+            if 225 < x < 345 and 445 < y < 470 and clic:
                 self.contnue()
 
     def contnue(self):
-        if not self.spell[self.title] and self.points >= 1:
-            self.error = ""
-            self.spell[self.title] = True
-            self.points -= 1
-            if self.title == "Разбитое сердцe":
-                self.player.max_health = 2500
-        elif not self.spell[self.title] and self.points == 0:
-            self.error = "Недостаточно ОУ"
+        if self.title != "":
+            if not self.spell[self.title] and self.points >= 1:
+                self.error = ""
+                self.spell[self.title] = True
+                self.points -= 1
+                if self.title == "Разбитое сердцe":
+                    self.player.max_health = 2500
+            elif not self.spell[self.title] and self.points == 0:
+                self.error = "Недостаточно ОУ"
+        else:
+            self.error = "Умение не выбранно"
