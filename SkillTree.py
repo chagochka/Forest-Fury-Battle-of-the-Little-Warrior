@@ -182,7 +182,7 @@ class SkillTree:
         # Вывод статистики предмета
         armor = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
         for i in range(5):
-            text_surf = self.font.render(str(self.player.inventory[armor[i]].stat + 150), False, (0, 0, 0))
+            text_surf = self.font.render(str(self.player.inventory[armor[i]].stat), False, (0, 0, 0))
             text_rect = text_surf.get_rect(bottomleft=(1220, 499 + 50 * i))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
