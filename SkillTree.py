@@ -124,6 +124,7 @@ class SkillTree:
     def cursor_location(self, coor, clic):
         x, y = coor
         self.new_text()
+        self.corup()
         line = open('coords_skill_tree.txt').readlines()
         for i in line:
             x1, y1, x2, y2, num = i.split(".")
@@ -146,3 +147,64 @@ class SkillTree:
                 self.error = "Недостаточно ОУ"
         else:
             self.error = "Умение не выбранно"
+
+    def corup(self):  # тест
+        text_surf = self.font.render(f"Шлем", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1130, 500))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Нагрудник", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1130, 550))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Поножи", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1130, 600))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Сапоги", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1130, 650))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Мечь", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1130, 700))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+        # Тест 2
+        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(830, 700))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(830, 650))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(830, 600))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(830, 550))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+
+        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(830, 500))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
