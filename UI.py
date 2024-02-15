@@ -1,4 +1,5 @@
 import pygame
+import csv
 
 
 class UI:
@@ -123,3 +124,17 @@ class UI:
 
 	def open_settings_window(self):
 		self.window.blit(pygame.image.load('images/settings_menu.png'), (0, 0))
+		font = pygame.font.Font('font/joystix.ttf', 40)
+
+		with open('binds.csv', encoding="utf8") as csvfile:
+			binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
+
+		cords = []
+		y = 170
+		for bind in binds[1]:
+			button = font.render(bind.upper(), False, 'white')
+			self.window.blit(button, (300, y))
+			cords.append((300, y, 300 + button.get_width(), y + button.get_height()))
+			y += 55
+
+		return cords
