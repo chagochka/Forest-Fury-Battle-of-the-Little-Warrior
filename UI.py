@@ -124,17 +124,24 @@ class UI:
 
 	def open_settings_window(self):
 		self.window.blit(pygame.image.load('images/settings_menu.png'), (0, 0))
-		font = pygame.font.Font('font/joystix.ttf', 40)
+		cords = []
 
 		with open('binds.csv', encoding="utf8") as csvfile:
-			binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
+			self.binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
 
-		cords = []
 		y = 170
-		for bind in binds[1]:
-			button = font.render(bind.upper(), False, 'white')
+		for bind in self.binds[1]:
+			font = pygame.font.Font('font/joystix.ttf', 40 if len(bind) == 1 else 20)
+			button = font.render(bind.replace('.', ' ').upper(), False, 'white')
 			self.window.blit(button, (300, y))
-			cords.append((300, y, 300 + button.get_width(), y + button.get_height()))
+			cords.append(
+				(300, y, 300 + button.get_width(), y + button.get_height(), bind))
 			y += 55
 
 		return cords
+
+	def change_bind(self, bind):
+		with open('binds.csv', 'w', newline='', encoding="utf8") as csvfile:
+			writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+			writer.writerow(self.binds[0])
+			writer.writerow(' '.join(self.binds[1]).replace(bind, 'Нажмите.нужную.кнопку.на.клавиатуре').split())
