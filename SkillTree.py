@@ -148,11 +148,6 @@ class SkillTree:
         Визуал для зачарования
         :return: None
         """
-        text_surf = self.font.render(f"Души: {self.player.kill}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
         # вывод статистики
         ststic = [f"Убито монстров: {str(self.player.kill)}",
                   f"Весь урона: {str(self.player.all_damage)}",
@@ -160,30 +155,38 @@ class SkillTree:
                   f"Общее исцеление: {str(self.player.all_hael)}"]
         for i in range(4):
             text_rect = self.font.render("хочу пицы и спать и балы", False,
-                                         (0, 0, 0)).get_rect(bottomleft=(900, 50 + 50 * i))
+                                         (0, 0, 0)).get_rect(bottomleft=(900, 50 + 30 * i))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
             self.window.blit(self.font.render(ststic[i], False, (0, 0, 0)), text_rect)
+        # Вывод количества душ
+        text_surf = self.font.render(f"Души: {self.player.kill}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
         # Вывод брони и её зачаровние
-        armor = ["Шлем", "Нагрудник", "Поножи", "Сапоги", "Мечь"]
+        armor1 = ["Мечь", "Шлем", "Нагрудник", "Поножи", "Сапоги"]
+        armor2 = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
         for i in range(5):
-            text_surf = self.font.render(armor[i], False, (0, 0, 0))
+            # Вывод брони и её зачаровние
+            text_surf = self.font.render(armor1[i], False, (0, 0, 0))
             text_rect = self.font.render('Нагрудник', False, (0, 0, 0)).get_rect(bottomleft=(1060, 500 + 50 * i))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
             self.window.blit(text_surf, text_rect)
-        # Вывод зачарований
-        for i in range(5):
-            text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-            text_rect = text_surf.get_rect(bottomleft=(765, 500 + 50 * i))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-            self.window.blit(text_surf, text_rect)
-        # Вывод статистики предмета
-        armor = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
-        for i in range(5):
-            text_surf = self.font.render(str(self.player.inventory[armor[i]].stat), False, (0, 0, 0))
+            # Вывод зачарований
+            text_rect = self.font.render(f"Предмет отсутствует", False,
+                                         (0, 0, 0)).get_rect(bottomleft=(750, 500 + 50 * i))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+            if self.player.inventory[armor2[i]].stat != 0:
+                self.window.blit(self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0)), text_rect)
+            else:
+                self.window.blit(self.font.render(f"Предмет отсутствует", False, (0, 0, 0)), text_rect)
+            # Вывод стат предметов
+            text_surf = self.font.render(str(self.player.inventory[armor2[i]].stat), False, (0, 0, 0))
             text_rect = text_surf.get_rect(bottomleft=(1220, 499 + 50 * i))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
             self.window.blit(text_surf, text_rect)
