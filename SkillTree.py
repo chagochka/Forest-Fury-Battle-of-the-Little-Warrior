@@ -59,11 +59,20 @@ class SkillTree:
                        "Волчья истерика", "Удача Дрима", "Пудж", "Звездочёт"]
 
     def point(self, score):
+        """
+        Даёт очки умений
+        :param score: int
+        :return: None
+        """
         if score > 1000 + self.all_points * 1000:
             self.points += 1
             self.all_points += 1
 
     def new_text(self):
+        """
+        Визул для древа навыков
+        :return: None
+        """
         # вывод названия перкa
         text_surf = self.font.render(str(self.title), False, (0, 0, 0))
         text_rect = text_surf.get_rect(bottomleft=(65, 310))
@@ -96,32 +105,14 @@ class SkillTree:
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
         self.window.blit(text_surf, text_rect)
-        # вывод статистики
-        text_surf = self.font.render(f"Убито монстров: {str(self.player.kill)}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(900, 50))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Весь урона: {str(self.player.all_damage)}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(900, 100))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Урона монстров: {str(self.player.all_mob_damage)}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(900, 150))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Общее исцеление: {str(self.player.all_hael)}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(900, 200))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
 
     def cursor_location(self, coor, clic):
+        """
+        Реакция на нажатие кнопок
+        :param coor: list
+        :param clic: bool
+        :return: None
+        """
         x, y = coor
         self.new_text()
         self.corup()
@@ -136,6 +127,10 @@ class SkillTree:
                 self.contnue()
 
     def contnue(self):
+        """
+        Вызывает ошибку (в визуале)
+        :return: None
+        """
         if self.title != "":
             if not self.spell[self.title] and self.points >= 1:
                 self.error = ""
@@ -148,63 +143,47 @@ class SkillTree:
         else:
             self.error = "Умение не выбранно"
 
-    def corup(self):  # тест
-        text_surf = self.font.render(f"Шлем", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1130, 500))
+    def corup(self):  # заготовка
+        """
+        Визуал для зачарования
+        :return: None
+        """
+        text_surf = self.font.render(f"Души: {self.player.kill}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
         pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
         self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Нагрудник", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1130, 550))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Поножи", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1130, 600))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Сапоги", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1130, 650))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Мечь", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1130, 700))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-        # Тест 2
-        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(830, 700))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(830, 650))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(830, 600))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(830, 550))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
-
-        text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(830, 500))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
+        # вывод статистики
+        ststic = [f"Убито монстров: {str(self.player.kill)}",
+                  f"Весь урона: {str(self.player.all_damage)}",
+                  f"Урона монстров: {str(self.player.all_mob_damage)}",
+                  f"Общее исцеление: {str(self.player.all_hael)}"]
+        for i in range(4):
+            text_rect = self.font.render("хочу пицы и спать и балы", False,
+                                         (0, 0, 0)).get_rect(bottomleft=(900, 50 + 50 * i))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(self.font.render(ststic[i], False, (0, 0, 0)), text_rect)
+        # Вывод брони и её зачаровние
+        armor = ["Шлем", "Нагрудник", "Поножи", "Сапоги", "Мечь"]
+        for i in range(5):
+            text_surf = self.font.render(armor[i], False, (0, 0, 0))
+            text_rect = self.font.render('Нагрудник', False, (0, 0, 0)).get_rect(bottomleft=(1060, 500 + 50 * i))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
+        # Вывод зачарований
+        for i in range(5):
+            text_surf = self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(765, 500 + 50 * i))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
+        # Вывод статистики предмета
+        armor = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
+        for i in range(5):
+            text_surf = self.font.render(str(self.player.inventory[armor[i]].stat + 150), False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(1220, 499 + 50 * i))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
