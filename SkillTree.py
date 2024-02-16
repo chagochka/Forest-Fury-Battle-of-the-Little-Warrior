@@ -59,11 +59,20 @@ class SkillTree:
                        "Волчья истерика", "Удача Дрима", "Пудж", "Звездочёт"]
 
     def point(self, score):
+        """
+        Даёт очки умений
+        :param score: int
+        :return: None
+        """
         if score > 1000 + self.all_points * 1000:
             self.points += 1
             self.all_points += 1
 
     def new_text(self):
+        """
+        Визул для древа навыков
+        :return: None
+        """
         # вывод названия перкa
         text_surf = self.font.render(str(self.title), False, (0, 0, 0))
         text_rect = text_surf.get_rect(bottomleft=(65, 310))
@@ -98,8 +107,15 @@ class SkillTree:
         self.window.blit(text_surf, text_rect)
 
     def cursor_location(self, coor, clic):
+        """
+        Реакция на нажатие кнопок
+        :param coor: list
+        :param clic: bool
+        :return: None
+        """
         x, y = coor
         self.new_text()
+        self.corup()
         line = open('coords_skill_tree.txt').readlines()
         for i in line:
             x1, y1, x2, y2, num = i.split(".")
@@ -107,15 +123,70 @@ class SkillTree:
             if x1 < x < y1 and x2 < y < y2 and clic:
                 self.title = self.spells[num]
                 self.description = self.descriptions[self.spells[num]]
-            if 300 < x < 420 and 280 < y < 310 and clic:
+            if 225 < x < 345 and 445 < y < 470 and clic:
                 self.contnue()
 
     def contnue(self):
-        if not self.spell[self.title] and self.points >= 1:
-            self.error = ""
-            self.spell[self.title] = True
-            self.points -= 1
-            if self.title == "Разбитое сердцe":
-                self.player.max_health = 2500
-        elif not self.spell[self.title] and self.points == 0:
-            self.error = "Недостаточно ОУ"
+        """
+        Вызывает ошибку (в визуале)
+        :return: None
+        """
+        if self.title != "":
+            if not self.spell[self.title] and self.points >= 1:
+                self.error = ""
+                self.spell[self.title] = True
+                self.points -= 1
+                if self.title == "Разбитое сердцe":
+                    self.player.max_health = 2500
+            elif not self.spell[self.title] and self.points == 0:
+                self.error = "Недостаточно ОУ"
+        else:
+            self.error = "Умение не выбранно"
+
+    def corup(self):  # заготовка
+        """
+        Визуал для зачарования
+        :return: None
+        """
+        # вывод статистики
+        ststic = [f"Убито монстров: {str(self.player.kill)}",
+                  f"Весь урона: {str(self.player.all_damage)}",
+                  f"Урона монстров: {str(self.player.all_mob_damage)}",
+                  f"Общее исцеление: {str(self.player.all_hael)}"]
+        for i in range(4):
+            text_rect = self.font.render("хочу пицы и спать и балы", False,
+                                         (0, 0, 0)).get_rect(bottomleft=(900, 50 + 30 * i))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
+            pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
+            self.window.blit(self.font.render(ststic[i], False, (0, 0, 0)), text_rect)
+        # Вывод количества душ
+        text_surf = self.font.render(f"Души: {self.player.kill}", False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
+        # Вывод брони и её зачаровние
+        armor1 = ["Мечь", "Шлем", "Нагрудник", "Поножи", "Сапоги"]
+        armor2 = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
+        for i in range(5):
+            # Вывод брони и её зачаровние
+            text_surf = self.font.render(armor1[i], False, (0, 0, 0))
+            text_rect = self.font.render('Нагрудник', False, (0, 0, 0)).get_rect(bottomleft=(1060, 500 + 50 * i))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
+            # Вывод зачарований
+            text_rect = self.font.render(f"Предмет отсутствует", False,
+                                         (0, 0, 0)).get_rect(bottomleft=(750, 500 + 50 * i))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+            if self.player.inventory[armor2[i]].stat != 0:
+                self.window.blit(self.font.render(f"Зачаровать: 10 душ", False, (0, 0, 0)), text_rect)
+            else:
+                self.window.blit(self.font.render(f"Предмет отсутствует", False, (0, 0, 0)), text_rect)
+            # Вывод стат предметов
+            text_surf = self.font.render(str(self.player.inventory[armor2[i]].stat), False, (0, 0, 0))
+            text_rect = text_surf.get_rect(bottomleft=(1220, 499 + 50 * i))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+            pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+            self.window.blit(text_surf, text_rect)
