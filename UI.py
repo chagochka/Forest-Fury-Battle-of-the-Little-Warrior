@@ -1,3 +1,5 @@
+import csv
+
 import pygame
 
 
@@ -9,8 +11,8 @@ class UI:
 
 	def items_draw(self):
 		y = 64  # вывод снаряжения
-		for item in self.player.inventory.values():
-			if item:
+		for item in list(self.player.inventory.values())[:-1]:
+			if item.image:
 				self.window.blit(item.image, (self.window.get_width() - 64, y - 64))
 				self.window.blit(self.font.render(str(item.stat), True, 'white'), (1280 - 80, y - 24))
 			y += 64
@@ -21,10 +23,10 @@ class UI:
 		:return: None
 		"""
 
-	# Отрисовка полоски здоровья игрока
-		pygame.draw.rect(self.window, '#222222', (10, 10, 250, 20))
+		# Отрисовка полоски здоровья игрока
+		pygame.draw.rect(self.window, '#222222', (10, 10, self.player.max_health / 2, 20))
 		pygame.draw.rect(self.window, 'red', (10, 10, self.player.health / 2, 20))
-		pygame.draw.rect(self.window, '#111111', (10, 10, 250, 20), 3)
+		pygame.draw.rect(self.window, '#111111', (10, 10, self.player.max_health / 2, 20), 3)
 
 		# Отрисовка опыта
 		text_surf = self.font.render(str(self.player.score), False, '#EEEEEE')
@@ -34,7 +36,7 @@ class UI:
 		self.window.blit(text_surf, text_rect)
 
 		# Отрисовка общей защиты
-		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:]])),
+		defens = self.font.render(str(sum([i.stat if i else 0 for i in list(self.player.inventory.values())[1:-1]])),
 		                          False, '#EEEEEE')
 		icon = pygame.image.load('images/armor.gif')
 		self.window.blit(icon, (10, 40))
@@ -88,31 +90,61 @@ class UI:
 				monsters.max_hp,
 				15), 3)
 
-
 	def inventory_draw(self):
 		"""
-			Рисует ячейки инвентаря и их содержимое
-			:return: None
-			"""
+		Рисует ячейки инвентаря и их содержимое
+		:return: None
+		"""
 		inventory_cell = pygame.image.load('images/inventory.gif')
 		potion_inventory = pygame.image.load('images/potion_in_inventory.gif')
+		rarity_colors = {
+			'uncommon': 'gray',
+			'mythical': 'purple',
+			'legendary': 'yellow'
+		}
 
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
-		self.window.blit(inventory_cell, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
-		if self.player.items_inventory[0]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 96, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[0]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 - 96 + 48, self.window.get_height() - 64 + 32))
-		if self.player.items_inventory[1]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 - 32, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[1]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 - 32 + 48, self.window.get_height() - 64 + 32))
-		if self.player.items_inventory[2]:
-			self.window.blit(potion_inventory, (self.window.get_width() // 2 + 32, self.window.get_height() - 64))
-			self.window.blit(self.font.render(str(self.player.items_inventory[2]), True, (200, 200, 200)),
-			                 (self.window.get_width() // 2 + 32 + 48, self.window.get_height() - 64 + 32))
+		x1 = -128
+		for i in range(3):
+			if len(self.player.inventory['potion']) >= i + 1 and self.player.inventory['potion'][i]:
+				pygame.draw.rect(
+					self.window, rarity_colors[self.player.inventory['potion'][i].rarity],
+					(self.window.get_width() // 2 + x1, self.window.get_height() - 64, 64, 64))
+			self.window.blit(inventory_cell, (self.window.get_width() // 2 + x1, self.window.get_height() - 64))
+			x1 += 64
 
+		x2 = -128
+		for bot in self.player.inventory['potion']:
+			self.window.blit(potion_inventory, (self.window.get_width() // 2 + x2, self.window.get_height() - 64))
+			stat = self.font.render(str(bot.stat), True, (200, 200, 200))
+			self.window.blit(stat, (
+				self.window.get_width() // 2 + x2 + (32 - stat.get_width() / 2), self.window.get_height() - 64 + 32))
+			x2 += 64
 
 	def set_cursor(self):
 		self.window.blit(pygame.image.load('images/dwarven_gauntlet.gif'), pygame.mouse.get_pos())
+
+	def open_settings_window(self):
+		self.window.blit(pygame.image.load('images/settings_menu.png'), (0, 0))
+		font = pygame.font.Font('font/joystix.ttf', 40)
+		cords = []
+
+		with open('binds.csv', encoding="utf8") as csvfile:
+			self.binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
+
+		y = 170
+		for bind in self.binds[1]:
+			button = font.render(bind.replace('.', ' ').upper(), False, 'white')
+
+			self.window.blit(button, (300, y))
+			cords.append(
+				(300, y, 300 + button.get_width(), y + button.get_height(), bind))
+			y += 55
+
+		return cords
+
+	def change_bind(self, latest_bind, new_bind):
+		with open('binds.csv', 'w', newline='', encoding="utf8") as csvfile:
+			writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+			writer.writerow(self.binds[0])
+			self.binds[1][self.binds[1].index(latest_bind)] = new_bind
+			writer.writerow(self.binds[1])
