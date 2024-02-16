@@ -697,11 +697,11 @@ while run:
 			fight_theme.stop()
 			menu_theme.stop()
 			skills_theme.play()
-			skilltree = pygame.image.load('images/skilltree.png')
+			skilltree = pygame.image.load('images/skill_tree.jpg')
 			window.blit(skilltree, (0, 0))
 
-			if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
-				450 >= pygame.mouse.get_pos()[1] >= 400:
+			if pygame.mouse.get_pressed()[0] and 215 >= pygame.mouse.get_pos()[0] >= 55 and \
+                    		490 >= pygame.mouse.get_pos()[1] >= 440:
 				inGame = True
 			tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
 			                     pygame.mouse.get_pressed()[0])
