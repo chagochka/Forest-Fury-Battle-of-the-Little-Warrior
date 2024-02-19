@@ -7,8 +7,8 @@ class Item:
     """
     rarities = ['common', 'uncommon', 'rare', 'mythical', 'legendary']
 
-    def __init__(self, image, rarity, item_type):
-
+    def __init__(self, image, rarity, item_type, ench=False):
+        self.ench = ench
         self.image = image
         self.rarity = rarity
         self.type = item_type
@@ -23,11 +23,16 @@ class Weapon(Item):
 
     def __init__(self, image, rarity, item_type):
         super().__init__(image, rarity, item_type)
+        self.ench = False
         self.image = image
         self.rarity = rarity
         self.type = item_type
         stats_index = self.rarities.index(self.rarity)
-        self.stat = random.randint(self.stats[stats_index][0], self.stats[stats_index][1])
+        if self.ench:
+            coof = 50
+        else:
+            coof = 0
+        self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1]) + coof
 
 
 class Armor(Item):
@@ -38,13 +43,18 @@ class Armor(Item):
         'helmet': [(3, 5), (5, 8), (8, 10), (10, 13), (13, 15)],
     }
 
-    def __init__(self, image, rarity, item_type):
-        super().__init__(image, rarity, item_type)
+    def __init__(self, image, rarity, item_type, ench=False):
+        super().__init__(image, rarity, item_type, ench)
+        self.ench = ench
         self.image = image
         self.rarity = rarity
         self.type = item_type
         stats_index = self.rarities.index(self.rarity)
-        self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1])
+        if self.ench:
+            coof = 50
+        else:
+            coof = 0
+        self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1]) + coof
 
 
 class HealingBottle(Item):
