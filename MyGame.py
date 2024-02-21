@@ -546,8 +546,12 @@ while run:
             if pygame.mouse.get_pressed()[0] and 215 >= pygame.mouse.get_pos()[0] >= 55 and \
                     490 >= pygame.mouse.get_pos()[1] >= 440:
                 inGame = True
-            tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
-                                 pygame.mouse.get_pressed()[0])
+            tree.go()
+            if pygame.mouse.get_pressed()[0]:
+                tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                     pygame.mouse.get_pressed()[0])
+                print(123)
+                pygame.time.delay(100)
         ui.set_cursor()
     cycle += 1
     pygame.display.update()

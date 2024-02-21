@@ -4,6 +4,7 @@ from item import *
 
 class SkillTree:
     def __init__(self, player, window, font):
+        self.dus = None
         self.player = player
         self.window = window
         self.font = font
@@ -64,6 +65,7 @@ class SkillTree:
                        "Я есть грунт", "Сила майнкрфта", "Разбитое сердце", "Я терпила", "Просвящённый",
                        "Волчья истерика", "Удача Дрима", "Пудж", "Звездочёт",
                        "Мечь", "Шлем", "Нагрудник", "Штаны", "Ботинки"]
+        self.minus = 0
 
     def point(self, score):
         """
@@ -75,11 +77,16 @@ class SkillTree:
             self.points += 1
             self.all_points += 1
 
+    def go(self):
+        self.new_text()
+        self.corup()
+
     def new_text(self):
         """
         Визул для древа навыков
         :return: None
         """
+        self.dus = self.player.kill - self.minus
         # вывод названия перкa
         text_surf = self.font.render(str(self.title), False, (0, 0, 0))
         text_rect = text_surf.get_rect(bottomleft=(65, 310))
@@ -94,7 +101,12 @@ class SkillTree:
         # ввывод изучена ли пасивкa
         if self.title != "":
             if self.title in ["Мечь", "Шлем", "Нагрудник", "Штаны", "Ботинки"]:
-                text_surf = self.font.render("Не зачарованно", False, (0, 0, 0))
+                armor2 = {"Мечь": 'sword', "Шлем": 'helmet',
+                          "Нагрудник": 'breastplate', "Штаны": 'trousers', "Ботинки": 'boots'}
+                if self.player.inventory[armor2[self.title]].ench:
+                    text_surf = self.font.render("Не зачарованно", False, (0, 0, 0))
+                else:
+                    text_surf = self.font.render("Не зачарованно", False, (0, 0, 0))
             elif self.spell[self.title]:
                 text_surf = self.font.render("Изучено", False, (0, 0, 0))
             else:
@@ -123,26 +135,26 @@ class SkillTree:
         :return: None
         """
         x, y = coor
-        self.new_text()
-        self.corup()
         line = open('coords_skill_tree.txt').readlines()
         for i in line:
             x1, y1, x2, y2, num = i.split(".")
             x1, x2, y1, y2, num = int(x1), int(y1), int(x2), int(y2), int(num)
-            if x1 < x < x2 and y1 < y < y2 and clic:
+            if x1 < x < x2 and y1 < y < y2:
                 self.title = self.spells[num]
                 self.description = self.descriptions[self.spells[num]]
-            if 225 < x < 345 and 445 < y < 470 and clic:
-                self.contnue()
+            if 225 < x < 345 and 445 < y < 470:
+                if self.title in ["Мечь", "Шлем", "Нагрудник", "Штаны", "Ботинки"] and clic:
+                    self.minus += 5
+                    self.enchants()
+                else:
+                    self.contnue()
 
     def contnue(self):
         """
         Вызывает ошибку (в визуале)
         :return: None
         """
-        if self.title in ["Мечь", "Шлем", "Нагрудник", "Штаны", "Ботинки"]:
-            self.enchants()
-        elif self.title != "":
+        if self.title != "":
             if not self.spell[self.title] and self.points >= 1:
                 self.error = ""
                 self.spell[self.title] = True
@@ -170,12 +182,6 @@ class SkillTree:
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
             self.window.blit(self.font.render(ststic[i], False, (0, 0, 0)), text_rect)
-        # Вывод количества душ
-        text_surf = self.font.render(f"Души: {self.player.kill}", False, (0, 0, 0))
-        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
-        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
-        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
-        self.window.blit(text_surf, text_rect)
         # Вывод брони и её зачаровние
         armor1 = ["Мечь", "Шлем", "Нагрудник", "Поножи", "Сапоги"]
         armor2 = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
@@ -207,8 +213,6 @@ class SkillTree:
         Зачарование предметам
         :return: None
         """
-        print(True)
-        print(self.title)
         items = {"Мечь": 'sword', "Шлем": 'helmet', "Нагрудник": 'breastplate', "Штаны": 'trousers', "Ботинки": 'boots'}
         item = self.player.inventory[items[self.title]]
         if self.title == "Мечь":
@@ -219,4 +223,3 @@ class SkillTree:
             self.player.inventory[items[self.title]] = Armor(
                 pygame.image.load(f'images/{item.rarity}_{item.type}.gif'),
                 item.rarity, item.type, ench=True)
-

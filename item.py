@@ -21,8 +21,8 @@ class Item:
 class Weapon(Item):
     stats = ((100, 120), (120, 150), (150, 170), (170, 200), (200, 250))
 
-    def __init__(self, image, rarity, item_type):
-        super().__init__(image, rarity, item_type)
+    def __init__(self, image, rarity, item_type, ench=False):
+        super().__init__(image, rarity, item_type, ench)
         self.ench = False
         self.image = image
         self.rarity = rarity
@@ -32,7 +32,7 @@ class Weapon(Item):
             coof = 50
         else:
             coof = 0
-        self.stat = random.randint(self.stats[self.type][stats_index][0], self.stats[self.type][stats_index][1]) + coof
+        self.stat = random.randint(self.stats[stats_index][0], self.stats[stats_index][1]) + coof
 
 
 class Armor(Item):
