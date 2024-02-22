@@ -86,7 +86,7 @@ class SkillTree:
         Визул для древа навыков
         :return: None
         """
-        self.dus = self.player.kill - self.minus
+        self.dus = self.player.kill - int(self.minus)
         # вывод названия перкa
         text_surf = self.font.render(str(self.title), False, (0, 0, 0))
         text_rect = text_surf.get_rect(bottomleft=(65, 310))
@@ -104,7 +104,7 @@ class SkillTree:
                 armor2 = {"Мечь": 'sword', "Шлем": 'helmet',
                           "Нагрудник": 'breastplate', "Штаны": 'trousers', "Ботинки": 'boots'}
                 if self.player.inventory[armor2[self.title]].ench:
-                    text_surf = self.font.render("Не зачарованно", False, (0, 0, 0))
+                    text_surf = self.font.render("Зачарованно", False, (0, 0, 0))
                 else:
                     text_surf = self.font.render("Не зачарованно", False, (0, 0, 0))
             elif self.spell[self.title]:
@@ -144,7 +144,6 @@ class SkillTree:
                 self.description = self.descriptions[self.spells[num]]
             if 225 < x < 345 and 445 < y < 470:
                 if self.title in ["Мечь", "Шлем", "Нагрудник", "Штаны", "Ботинки"] and clic:
-                    self.minus += 5
                     self.enchants()
                 else:
                     self.contnue()
@@ -182,6 +181,12 @@ class SkillTree:
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20))
             pygame.draw.rect(self.window, '#f7da9e', text_rect.inflate(20, 20), 3)
             self.window.blit(self.font.render(ststic[i], False, (0, 0, 0)), text_rect)
+        # кол-во душ
+        text_surf = self.font.render("Души: " + str(self.dus), False, (0, 0, 0))
+        text_rect = text_surf.get_rect(bottomleft=(1100, 450))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(10, 10))
+        pygame.draw.rect(self.window, '#aaf0d1', text_rect.inflate(20, 20), 3)
+        self.window.blit(text_surf, text_rect)
         # Вывод брони и её зачаровние
         armor1 = ["Мечь", "Шлем", "Нагрудник", "Поножи", "Сапоги"]
         armor2 = ['sword', 'helmet', 'breastplate', 'trousers', 'boots']
@@ -215,11 +220,17 @@ class SkillTree:
         """
         items = {"Мечь": 'sword', "Шлем": 'helmet', "Нагрудник": 'breastplate', "Штаны": 'trousers', "Ботинки": 'boots'}
         item = self.player.inventory[items[self.title]]
-        if self.title == "Мечь":
-            self.player.inventory[items[self.title]] = Weapon(
-                pygame.image.load(f'images/{item.rarity}_sword.gif'),
-                item.rarity, 'sword', ench=True)
-        if self.title != "Мечь":
-            self.player.inventory[items[self.title]] = Armor(
-                pygame.image.load(f'images/{item.rarity}_{item.type}.gif'),
-                item.rarity, item.type, ench=True)
+        if self.player.inventory[items[self.title]].stat == 0:
+            self.error = "Выбран не существующий элемент брони"
+        elif self.dus >= 5:
+            self.minus += 0.2083
+            if self.title == "Мечь":
+                self.player.inventory[items[self.title]] = Weapon(
+                    pygame.image.load(f'images/{item.rarity}_sword.gif'),
+                    item.rarity, 'sword', ench=True)
+            if self.title != "Мечь":
+                self.player.inventory[items[self.title]] = Armor(
+                    pygame.image.load(f'images/{item.rarity}_{item.type}.gif'),
+                    item.rarity, item.type, ench=True)
+        else:
+            self.error = "Недостаточно душ"
