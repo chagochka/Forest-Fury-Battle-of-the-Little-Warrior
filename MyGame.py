@@ -1,11 +1,12 @@
-import csv
-import os
+import random
 
 import pygame
+from pygame import transform
 
-from SkillTree import SkillTree
-from UI import UI
 from item import *
+from UI import UI
+from SkillTree import SkillTree
+import os
 
 
 def load_image(name):
@@ -387,7 +388,7 @@ def game_over():
     picture = pygame.image.load('images/game_over.jpg')
     window.blit(picture, (0, 0))
 
-
+    
 width, height = 1280, 720
 
 group_sprites = pygame.sprite.Group()
@@ -549,7 +550,6 @@ ui = UI(window, font, player)
 
 stop = "menu"
 inGame = False
-in_settings = False
 items = []
 run = True
 cycle = 0
@@ -704,8 +704,11 @@ while run:
             if pygame.mouse.get_pressed()[0] and 215 >= pygame.mouse.get_pos()[0] >= 55 and \
                     490 >= pygame.mouse.get_pos()[1] >= 440:
                 inGame = True
-            tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
-                                 pygame.mouse.get_pressed()[0])
+            tree.go()
+            if pygame.mouse.get_pressed()[0]:
+                tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                     pygame.mouse.get_pressed()[0])
+                pygame.time.delay(100)
         ui.set_cursor()
     pygame.display.update()
 
