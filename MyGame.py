@@ -1,3 +1,4 @@
+import csv
 import random
 
 import pygame
@@ -550,6 +551,7 @@ ui = UI(window, font, player)
 
 stop = "menu"
 inGame = False
+in_settings = False
 items = []
 run = True
 cycle = 0
