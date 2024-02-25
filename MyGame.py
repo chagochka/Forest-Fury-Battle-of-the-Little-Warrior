@@ -81,9 +81,9 @@ class Monster(pygame.sprite.Sprite):
 
     def is_life(self):
         """
-		Проверка живой ли монстр, если нет то выпадает дроп
-		:return: bool
-		"""
+        Проверка живой ли монстр, если нет то выпадает дроп
+        :return: bool
+        """
         if self.hp <= 0:
             types = [Weapon, Armor]
             weights = [1, 3]
@@ -401,6 +401,138 @@ window = pygame.display.set_mode((width, height))
 pygame.display.set_caption('fight!')
 
 font = pygame.font.Font('font/joystix.ttf', 18)
+buttons_dict = {
+    'a': pygame.K_a,
+    'b': pygame.K_b,
+    'c': pygame.K_c,
+    'd': pygame.K_d,
+    'e': pygame.K_e,
+    'f': pygame.K_f,
+    'g': pygame.K_g,
+    'h': pygame.K_h,
+    'i': pygame.K_i,
+    'j': pygame.K_j,
+    'k': pygame.K_k,
+    'l': pygame.K_l,
+    'm': pygame.K_m,
+    'n': pygame.K_n,
+    'o': pygame.K_o,
+    'p': pygame.K_p,
+    'q': pygame.K_q,
+    'r': pygame.K_r,
+    's': pygame.K_s,
+    't': pygame.K_t,
+    'u': pygame.K_u,
+    'v': pygame.K_v,
+    'w': pygame.K_w,
+    'x': pygame.K_x,
+    'y': pygame.K_y,
+    'z': pygame.K_z,
+    'backspace': pygame.K_BACKSPACE,
+    'tab': pygame.K_TAB,
+    'clear': pygame.K_CLEAR,
+    'return': pygame.K_RETURN,
+    'pause': pygame.K_PAUSE,
+    'escape': pygame.K_ESCAPE,
+    'space': pygame.K_SPACE,
+    'exclaim': pygame.K_EXCLAIM,
+    'quotedbl': pygame.K_QUOTEDBL,
+    'hash': pygame.K_HASH,
+    'dollar': pygame.K_DOLLAR,
+    'ampersand': pygame.K_AMPERSAND,
+    'quote': pygame.K_QUOTE,
+    'leftparen': pygame.K_LEFTPAREN,
+    'rightparen': pygame.K_RIGHTPAREN,
+    'asterisk': pygame.K_ASTERISK,
+    'plus': pygame.K_PLUS,
+    'comma': pygame.K_COMMA,
+    'minus': pygame.K_MINUS,
+    'period': pygame.K_PERIOD,
+    'slash': pygame.K_SLASH,
+    'num0': pygame.K_0,
+    'num1': pygame.K_1,
+    'num2': pygame.K_2,
+    'num3': pygame.K_3,
+    'num4': pygame.K_4,
+    'num5': pygame.K_5,
+    'num6': pygame.K_6,
+    'num7': pygame.K_7,
+    'num8': pygame.K_8,
+    'num9': pygame.K_9,
+    'colon': pygame.K_COLON,
+    'semicolon': pygame.K_SEMICOLON,
+    'less': pygame.K_LESS,
+    'equals': pygame.K_EQUALS,
+    'greater': pygame.K_GREATER,
+    'question': pygame.K_QUESTION,
+    'at': pygame.K_AT,
+    'leftbracket': pygame.K_LEFTBRACKET,
+    'backslash': pygame.K_BACKSLASH,
+    'rightbracket': pygame.K_RIGHTBRACKET,
+    'caret': pygame.K_CARET,
+    'underscore': pygame.K_UNDERSCORE,
+    'backquote': pygame.K_BACKQUOTE,
+    'delete': pygame.K_DELETE,
+    'keypad0': pygame.K_KP0,
+    'keypad1': pygame.K_KP1,
+    'keypad2': pygame.K_KP2,
+    'keypad3': pygame.K_KP3,
+    'keypad4': pygame.K_KP4,
+    'keypad5': pygame.K_KP5,
+    'keypad6': pygame.K_KP6,
+    'keypad7': pygame.K_KP7,
+    'keypad8': pygame.K_KP8,
+    'keypad9': pygame.K_KP9,
+    'keypad_period': pygame.K_KP_PERIOD,
+    'keypad_divide': pygame.K_KP_DIVIDE,
+    'keypad_multiply': pygame.K_KP_MULTIPLY,
+    'keypad_minus': pygame.K_KP_MINUS,
+    'keypad_plus': pygame.K_KP_PLUS,
+    'keypad_enter': pygame.K_KP_ENTER,
+    'keypad_equals': pygame.K_KP_EQUALS,
+    'up': pygame.K_UP,
+    'down': pygame.K_DOWN,
+    'right': pygame.K_RIGHT,
+    'left': pygame.K_LEFT,
+    'insert': pygame.K_INSERT,
+    'home': pygame.K_HOME,
+    'end': pygame.K_END,
+    'pageup': pygame.K_PAGEUP,
+    'pagedown': pygame.K_PAGEDOWN,
+    'f1': pygame.K_F1,
+    'f2': pygame.K_F2,
+    'f3': pygame.K_F3,
+    'f4': pygame.K_F4,
+    'f5': pygame.K_F5,
+    'f6': pygame.K_F6,
+    'f7': pygame.K_F7,
+    'f8': pygame.K_F8,
+    'f9': pygame.K_F9,
+    'f10': pygame.K_F10,
+    'f11': pygame.K_F11,
+    'f12': pygame.K_F12,
+    'f13': pygame.K_F13,
+    'f14': pygame.K_F14,
+    'f15': pygame.K_F15,
+    'numlock': pygame.K_NUMLOCK,
+    'capslock': pygame.K_CAPSLOCK,
+    'scrolllock': pygame.K_SCROLLOCK,
+    'rshift': pygame.K_RSHIFT,
+    'lshift': pygame.K_LSHIFT,
+    'rctrl': pygame.K_RCTRL,
+    'lctrl': pygame.K_LCTRL,
+    'ralt': pygame.K_RALT,
+    'lalt': pygame.K_LALT,
+    'rmeta': pygame.K_RMETA,
+    'lmeta': pygame.K_LMETA,
+    'lsuper': pygame.K_LSUPER,
+    'rsuper': pygame.K_RSUPER,
+    'mode': pygame.K_MODE,
+    'help': pygame.K_HELP,
+    'print': pygame.K_PRINT,
+    'sysreq': pygame.K_SYSREQ,
+    'break': pygame.K_BREAK
+}
 
 menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
 fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
@@ -425,10 +557,14 @@ cycle = 0
 tree = SkillTree(player, window, font)
 
 while run:
+    with open('binds.csv', encoding="utf8") as csvfile:
+        binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
+        binds = dict(zip(binds[0], binds[1]))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if inGame and event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+        if inGame and event.type == pygame.KEYDOWN and event.key == buttons_dict[binds['use_potion']]:
             if player.inventory['potion']:
                 player.inventory['potion'].pop().heal(player)
 
@@ -443,13 +579,13 @@ while run:
         menu_theme.stop()
         fight_theme.set_volume(0.01)
         fight_theme.play()
-        if key[pygame.K_d] and player.x < 1160:  # движение героя
+        if key[buttons_dict[binds['move_right']]] and player.x < 1160:  # движение героя
             player.move_right()
-        if key[pygame.K_s] and player.y < 610:
+        if key[buttons_dict[binds['move_back']]] and player.y < 610:
             player.move_down()
-        if key[pygame.K_a] and player.x >= 64:
+        if key[buttons_dict[binds['move_left']]] and player.x >= 64:
             player.move_left()
-        if key[pygame.K_w] and player.y >= 64:
+        if key[buttons_dict[binds['move_forward']]] and player.y >= 64:
             player.move_up()
         if key[pygame.K_e] or mouse[0]:
             player.damage_given()
@@ -522,7 +658,26 @@ while run:
         if player.health <= 0:
             game_over()
 
+        cycle += 1
         clock.tick(300)
+    elif in_settings:
+        fight_theme.stop()
+        skills_theme.stop()
+        menu_theme.play()
+
+        cords = ui.open_settings_window()
+
+        for cord in cords:
+            if cord[2] >= pygame.mouse.get_pos()[0] >= cord[0] and cord[3] >= pygame.mouse.get_pos()[1] >= cord[1]:
+                pygame.draw.rect(window, '#FFCB30', (cord[0], cord[1], 40, 50))
+                for let_char, pg_char in buttons_dict.items():
+                    if key[pg_char]:
+                        ui.change_bind(cord[-1], let_char)
+
+        if key[pygame.K_ESCAPE]:
+            in_settings = False
+
+        ui.set_cursor()
     else:
         if stop == "menu":
             fight_theme.stop()
@@ -533,6 +688,9 @@ while run:
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                     300 >= pygame.mouse.get_pos()[1] >= 240:
                 inGame = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    390 >= pygame.mouse.get_pos()[1] >= 320:
+                in_settings = True
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                     480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
@@ -552,7 +710,6 @@ while run:
                                      pygame.mouse.get_pressed()[0])
                 pygame.time.delay(100)
         ui.set_cursor()
-    cycle += 1
     pygame.display.update()
 
 pygame.quit()
