@@ -55,8 +55,7 @@ class Monster(pygame.sprite.Sprite):
             'medium': 'spider.gif',
             'high': 'knight.gif',
             'boss': 'boss.gif',
-            # 'boss_eye': 'boss_eye.gif'
-            'boss_eye': 'глазик.png'
+            'boss_eye': 'demon_eye.png'
         }
 
         self.x = random.randint(0, 1160)
@@ -170,9 +169,9 @@ class GlobalBoss(Monster):
         super().__init__(boss_type='boss_eye')
         self.rect = pygame.Rect(self.x - 128, self.y - 128, 256, 256)
         self.images = list()
-        self.images.append(load_image('глазик.png').subsurface(pygame.Rect((0, 0), (96, 96))))
+        self.images.append(load_image('demon_eye.png').subsurface(pygame.Rect((0, 0), (96, 96))))
         self.images.append(pygame.transform.flip(self.images[0], True, False))
-        self.images.append(load_image('глазик.png').subsurface(pygame.Rect((96, 192), (96, 96))))
+        self.images.append(load_image('demon_eye.png').subsurface(pygame.Rect((96, 192), (96, 96))))
         self.images.append(pygame.transform.flip(self.images[2], True, False))
 
 
@@ -225,7 +224,7 @@ class Player(pygame.sprite.Sprite):
         self.x = 580
         self.y = 305
         self.timer = 0
-        self.score = 5000
+        self.score = 0
         self.right = True
         self.immortality = False
         self.global_bosses = 0
