@@ -8,6 +8,7 @@ from item import *
 from UI import UI
 from SkillTree import SkillTree
 import os
+from pygame import surface
 
 
 def load_image(name):
@@ -54,7 +55,8 @@ class Monster(pygame.sprite.Sprite):
             'medium': 'spider.gif',
             'high': 'knight.gif',
             'boss': 'boss.gif',
-            'boss_eye': 'boss_eye.gif'
+            # 'boss_eye': 'boss_eye.gif'
+            'boss_eye': 'глазик.png'
         }
 
         self.x = random.randint(0, 1160)
@@ -150,9 +152,15 @@ class Monster(pygame.sprite.Sprite):
 
     def update(self):
         if self.right:
-            self.image = self.images[0]
+            if len(self.images) == 4:
+                self.image = self.images[0] if self.timer % 200 > 50 else self.images[2]
+            else:
+                self.image = self.images[0]
         else:
-            self.image = self.images[1]
+            if len(self.images) == 4:
+                self.image = self.images[1] if self.timer % 200 > 50 else self.images[3]
+            else:
+                self.image = self.images[1]
         if not pygame.sprite.collide_mask(self, player):
             self.monster_move()
 
@@ -161,6 +169,11 @@ class GlobalBoss(Monster):
     def __init__(self):
         super().__init__(boss_type='boss_eye')
         self.rect = pygame.Rect(self.x - 128, self.y - 128, 256, 256)
+        self.images = list()
+        self.images.append(load_image('глазик.png').subsurface(pygame.Rect((0, 0), (96, 96))))
+        self.images.append(pygame.transform.flip(self.images[0], True, False))
+        self.images.append(load_image('глазик.png').subsurface(pygame.Rect((96, 192), (96, 96))))
+        self.images.append(pygame.transform.flip(self.images[2], True, False))
 
 
 class Fireball(pygame.sprite.Sprite):
@@ -212,7 +225,7 @@ class Player(pygame.sprite.Sprite):
         self.x = 580
         self.y = 305
         self.timer = 0
-        self.score = 0
+        self.score = 5000
         self.right = True
         self.immortality = False
         self.global_bosses = 0
@@ -232,7 +245,8 @@ class Player(pygame.sprite.Sprite):
         self.all_hael = 0
 
         self.image = load_image('ninja.gif')
-        self.images = [load_image('ninja.gif'), pygame.transform.flip(self.image, True, False)]
+        # self.image = pygame.image.load('images/127780478214278209e46259d610229a.png')
+        self.images = [self.image, pygame.transform.flip(self.image, True, False)]
         self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
         self.mask = pygame.mask.from_surface(self.image)
 
