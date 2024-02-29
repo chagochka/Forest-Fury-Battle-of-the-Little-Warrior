@@ -1,22 +1,18 @@
 import csv
-import random
-
 import pygame
-from pygame import transform
 
 from item import *
 from UI import UI
 from SkillTree import SkillTree
 import os
-from pygame import surface
 
 
 def load_image(name):
 	"""
-    Функция загрузки изображения из файла.
-    :param name: Имя файла
-    :return: изображение
-    """
+	Функция загрузки изображения из файла.
+	:param name: Имя файла
+	:return: изображение
+	"""
 	filename = os.path.join('images', name)
 	try:
 		image = pygame.image.load(filename)
@@ -28,8 +24,8 @@ def load_image(name):
 
 class Monster(pygame.sprite.Sprite):
 	"""
-    Класс монстра
-    """
+	Класс монстра
+	"""
 
 	def __init__(self, speed=False, boss_type=None):
 		super().__init__(group_sprites)
@@ -96,8 +92,9 @@ class Monster(pygame.sprite.Sprite):
 			for s2 in range(tup[0]):
 				image = load_image(
 					self.monster_textures[self.diff]).subsurface(
-					pygame.Rect((int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
-					            (int(tup[2] / tup[0]), int(tup[3] / tup[1]))))
+					pygame.Rect(
+						(int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
+						(int(tup[2] / tup[0]), int(tup[3] / tup[1]))))
 				if self.diff not in ('boss', 'boss_eye'):
 					self.images.append(pygame.transform.scale(image, (128, 128)))
 				else:
@@ -105,9 +102,9 @@ class Monster(pygame.sprite.Sprite):
 
 	def is_life(self):
 		"""
-        Проверка живой ли монстр, если нет то выпадает дроп
-        :return: bool
-        """
+		Проверка живой ли монстр, если нет то выпадает дроп
+		:return: bool
+		"""
 		if self.hp <= 0:
 			types = [Weapon, Armor]
 			weights = [1, 3]
@@ -143,9 +140,9 @@ class Monster(pygame.sprite.Sprite):
 
 	def monster_move(self):
 		"""
-        Движение монстра по карте (автоматически)
-        :return: None
-        """
+		Движение монстра по карте (автоматически)
+		:return: None
+		"""
 		if self.hp > 0:
 			if player.x != int(self.x):
 				if player.x > self.x:
@@ -163,9 +160,9 @@ class Monster(pygame.sprite.Sprite):
 
 	def attack(self):
 		"""
-        Атака по игроку (автоматически) + кд
-        :return None
-        """
+		Атака по игроку (автоматически) + кд
+		:return None
+		"""
 		if pygame.sprite.collide_mask(self, player) and self.hp > 0 >= self.timer and not player.immortality:
 			player.damage_taken(self.atk)
 			self.timer = 500
@@ -233,8 +230,8 @@ class Fireball(pygame.sprite.Sprite):
 
 class Player(pygame.sprite.Sprite):
 	"""
-    Класс игрока
-    """
+	Класс игрока
+	"""
 
 	def __init__(self):
 		super().__init__(group_sprites)
@@ -271,10 +268,10 @@ class Player(pygame.sprite.Sprite):
 
 	def damage_taken(self, damage):
 		"""
-        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
-        :param damage: int
-        :return: None
-        """
+		Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
+		:param damage: int
+		:return: None
+		"""
 		if not self.immortality:
 			if tree.spell["Я есть грунт"]:
 				coof = damage / 100 * (
@@ -298,9 +295,9 @@ class Player(pygame.sprite.Sprite):
 
 	def damage_given(self):  # Нанесение урона мобу
 		"""
-        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
-        :return: None
-        """
+		Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
+		:return: None
+		"""
 		if monsters.hp > 0 >= player.timer and self.health >= 0:
 			if self.attack_range():
 				coof2 = 0
@@ -331,9 +328,9 @@ class Player(pygame.sprite.Sprite):
 
 	def health_max_more(self):
 		"""
-        Ограничивает здоровье максимальным
-        :return: None
-        """
+		Ограничивает здоровье максимальным
+		:return: None
+		"""
 		if self.health > self.max_health:
 			if tree.spell["Абаддон"]:
 				monsters.hp -= self.health - self.max_health
@@ -342,19 +339,21 @@ class Player(pygame.sprite.Sprite):
 
 	def attack_range(self, attack_range=128):  # радиус атаки
 		"""
-        Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
-        :return: bool
-        """
+		Возвращает True/False в зависимости от того насколько близко монстр находится к игроку (до 128 пикселей - True)
+		:return: bool
+		"""
 		if tree.spell["Дуновение ветерка"]:  # Ослобляет игрока (не баг а фича)
 			attack_range = 140
-		return (-attack_range <= self.x - monsters.x <= attack_range and
-		        -attack_range <= self.y - monsters.y <= attack_range)
+		return (
+			-attack_range <= self.x - monsters.x <= attack_range
+			and -attack_range <= self.y - monsters.y <= attack_range
+		)
 
 	def move_left(self):  # Движение игрока по карте
 		"""
-        Перемещает персонажа по оси Х влево
-        :return: None
-        """
+		Перемещает персонажа по оси Х влево
+		:return: None
+		"""
 		coof = 1
 		if self.x - coof >= 0 and self.health > 0:
 			self.x -= coof
@@ -365,9 +364,9 @@ class Player(pygame.sprite.Sprite):
 
 	def move_right(self):  # Движение игрока по карте
 		"""
-        Перемещает персонажа по оси Х вправо
-        :return: None
-        """
+		Перемещает персонажа по оси Х вправо
+		:return: None
+		"""
 		coof = 1
 		if self.x + coof <= 1160 and self.health > 0:
 			self.x += coof
@@ -378,9 +377,9 @@ class Player(pygame.sprite.Sprite):
 
 	def move_down(self):  # Движение игрока по карте
 		"""
-        Перемещает персонажа по оси У вниз
-        :return: None
-        """
+		Перемещает персонажа по оси У вниз
+		:return: None
+		"""
 		coof = 1
 		if self.y + coof <= 610 and self.health > 0:
 			self.y += coof
@@ -390,9 +389,9 @@ class Player(pygame.sprite.Sprite):
 
 	def move_up(self):  # Движение игрока по карте
 		"""
-        Перемещает персонажа по оси У вверх
-        :return: None
-        """
+		Перемещает персонажа по оси У вверх
+		:return: None
+		"""
 		coof = 1
 		if self.health > 0:
 			if self.y - coof >= 0:
@@ -403,12 +402,12 @@ class Player(pygame.sprite.Sprite):
 
 	def find_item(self, x, y):
 		"""
-        Возвращает True/False в зависимости от того находится ли персонаж рядом с зельем
-        (расстояние, для того чтобы подобрать предмет)
-        :param x: int
-        :param y: int
-        :return: bool
-        """
+		Возвращает True/False в зависимости от того находится ли персонаж рядом с зельем
+		(расстояние, для того чтобы подобрать предмет)
+		:param x: int
+		:param y: int
+		:return: bool
+		"""
 		return -64 <= self.x - x <= 64 and -64 <= self.y - y <= 64
 
 	def image_slicer(self):
@@ -749,8 +748,8 @@ while run:
 				inGame = True
 			tree.go()
 			if pygame.mouse.get_pressed()[0]:
-				tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
-				                     pygame.mouse.get_pressed()[0])
+				tree.cursor_location(
+					(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]), pygame.mouse.get_pressed()[0])
 				pygame.time.delay(100)
 		ui.set_cursor()
 	pygame.display.update()
