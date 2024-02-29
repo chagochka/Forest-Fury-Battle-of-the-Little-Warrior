@@ -52,12 +52,6 @@ class Monster(pygame.sprite.Sprite):
 
         }
 
-        """'low': 'slither.gif',
-            'medium': 'spider.gif',
-            'high': 'knight.gif',
-            'boss': 'boss.gif',
-            'boss_eye': 'boss_eye.gif',"""
-
         self.monster_textures = {
             'low': 'slither.png',
             'medium': 'spider.png',
@@ -194,6 +188,11 @@ class GlobalBoss(Monster):
     def __init__(self):
         super().__init__(boss_type='boss_eye')
         self.rect = pygame.Rect(self.x - 128, self.y - 128, 256, 256)
+        self.images = list()
+        self.images.append(load_image('demon_eye.png').subsurface(pygame.Rect((0, 0), (96, 96))))
+        self.images.append(pygame.transform.flip(self.images[0], True, False))
+        self.images.append(load_image('demon_eye.png').subsurface(pygame.Rect((96, 192), (96, 96))))
+        self.images.append(pygame.transform.flip(self.images[2], True, False))
 
 
 class Fireball(pygame.sprite.Sprite):
