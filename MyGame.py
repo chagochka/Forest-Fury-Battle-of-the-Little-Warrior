@@ -33,13 +33,14 @@ class Monster(pygame.sprite.Sprite):
 
     def __init__(self, speed=False, boss_type=None):
         super().__init__(group_sprites)
+        self.images = list()
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
             'low': [20, (100, 150), 0.7, 64],  # атака, хп монстра
             'medium': [50, (150, 200), 0.5, 64],
             'high': [75, (200, 250), 0.3, 64],
             'boss': [100, (250, 500), 0.3, 64],
-            'boss_eye': [200, (2499, 2500), 0.25, 64]  # надо переделать под дальнюю атаку
+            'boss_eye': [200, (2499, 2500), 0.25, 64]
         }
         self.timer = 0
         self.scores = {
@@ -50,24 +51,25 @@ class Monster(pygame.sprite.Sprite):
             'boss_eye': 500
 
         }
+
         self.monster_textures = {
-            'low': 'slither.gif',
-            'medium': 'spider.gif',
-            'high': 'knight.gif',
-            'boss': 'boss.gif',
-            'boss_eye': 'demon_eye.png'
+            'low': 'slither.png',
+            'medium': 'spider.png',
+            'high': 'knight.png',
+            'boss': 'boss.png',
+            'boss_eye': 'boss_eye.png'
         }
 
         self.x = random.randint(0, 1160)
         self.y = random.randint(0, 610)
 
-        if boss_type is None:  # супер боссы
+        if boss_type is None:  # супер босс
             self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
         else:
             self.diff = boss_type
 
         self.image = load_image(self.monster_textures[self.diff])
-        self.images = [load_image(self.monster_textures[self.diff]), pygame.transform.flip(self.image, True, False)]
+        self.image_slicer()
         self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
 
         self.atk = self.monster_statistics[self.diff][0]
@@ -80,6 +82,26 @@ class Monster(pygame.sprite.Sprite):
         self.right = True
         self.attack_range = self.monster_statistics[self.diff][3]
         self.texture = []
+
+    def image_slicer(self):
+        slices_info = {
+            'low': (3, 2, 384, 256),  # x, y, x, y
+            'medium': (3, 2, 768, 512),
+            'high': (2, 2, 256, 256),
+            'boss': (3, 2, 384, 256),
+            'boss_eye': (3, 3, 288, 288)
+        }
+        tup = slices_info[self.diff]  # размеры спрайта
+        for s1 in range(tup[1]):
+            for s2 in range(tup[0]):
+                image = load_image(
+                    self.monster_textures[self.diff]).subsurface(
+                    pygame.Rect((int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
+                                (int(tup[2] / tup[0]), int(tup[3] / tup[1]))))
+                if self.diff not in ('boss', 'boss_eye'):
+                    self.images.append(pygame.transform.scale(image, (128, 128)))
+                else:
+                    self.images.append(pygame.transform.scale(image, (256, 256)))
 
     def is_life(self):
         """
@@ -137,29 +159,27 @@ class Monster(pygame.sprite.Sprite):
                     self.y += self.speed
                 else:
                     self.y -= self.speed
-        self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
+        self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def attack(self):
         """
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if (player.attack_range(self.attack_range) or pygame.sprite.collide_mask(self, player)) \
-                and self.hp > 0 >= self.timer and not player.immortality:
+        if pygame.sprite.collide_mask(self, player) and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
 
     def update(self):
-        if self.right:
-            if len(self.images) == 4:
-                self.image = self.images[0] if self.timer % 200 > 50 else self.images[2]
-            else:
-                self.image = self.images[0]
-        else:
-            if len(self.images) == 4:
-                self.image = self.images[1] if self.timer % 200 > 50 else self.images[3]
-            else:
-                self.image = self.images[1]
+        frames_count = {
+            'low': 6,
+            'medium': 6,
+            'high': 4,
+            'boss': 5,
+            'boss_eye': 9
+        }
+        image = self.images[(abs(self.timer // (500 // frames_count[self.diff])) - 1) % frames_count[self.diff]]
+        self.image = image if self.right else pygame.transform.flip(image, True, False)
         if not pygame.sprite.collide_mask(self, player):
             self.monster_move()
 
@@ -218,6 +238,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__(group_sprites)
+        self.images = list()
         self.health = 500
         self.max_health = 500
         self.attack = 50
@@ -243,10 +264,9 @@ class Player(pygame.sprite.Sprite):
         self.all_mob_damage = 0
         self.all_hael = 0
 
-        self.image = load_image('ninja.gif')
-        # self.image = pygame.image.load('images/127780478214278209e46259d610229a.png')
-        self.images = [self.image, pygame.transform.flip(self.image, True, False)]
-        self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
+        self.image = load_image('player.png')
+        self.image_slicer()
+        self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
         self.mask = pygame.mask.from_surface(self.image)
 
     def damage_taken(self, damage):
@@ -257,13 +277,13 @@ class Player(pygame.sprite.Sprite):
         """
         if not self.immortality:
             if tree.spell["Я есть грунт"]:
-                coof = damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 5))
             elif tree.spell["Я терпила"] and self.health < 200:
-                coof = damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 15))
             else:
-                coof = damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]])))
             self.health -= coof
             self.all_mob_damage += coof
@@ -340,7 +360,7 @@ class Player(pygame.sprite.Sprite):
             self.x -= coof
             if tree.spell["Сапоги Гермеса"]:
                 self.health += 0.01
-            self.rect = self.rect.move(-coof, 0)
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
             self.right = False
 
     def move_right(self):  # Движение игрока по карте
@@ -353,7 +373,7 @@ class Player(pygame.sprite.Sprite):
             self.x += coof
             if tree.spell["Сапоги Гермеса"]:
                 self.health += 0.01
-            self.rect = self.rect.move(coof, 0)
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
             self.right = True
 
     def move_down(self):  # Движение игрока по карте
@@ -366,7 +386,7 @@ class Player(pygame.sprite.Sprite):
             self.y += coof
             if tree.spell["Сапоги Гермеса"]:
                 self.health += 0.01
-            self.rect = self.rect.move(0, coof)
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def move_up(self):  # Движение игрока по карте
         """
@@ -379,7 +399,7 @@ class Player(pygame.sprite.Sprite):
                 self.y -= coof
                 if tree.spell["Сапоги Гермеса"]:
                     self.health += 0.01
-                self.rect = self.rect.move(0, -coof)
+                self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def find_item(self, x, y):
         """
@@ -391,11 +411,19 @@ class Player(pygame.sprite.Sprite):
         """
         return -64 <= self.x - x <= 64 and -64 <= self.y - y <= 64
 
+    def image_slicer(self):
+        tup = (2, 2, 256, 256)  # размеры спрайта
+        for s1 in range(tup[1]):
+            for s2 in range(tup[0]):
+                self.images.append(
+                    load_image('player.png').subsurface(
+                        pygame.Rect(
+                            (int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
+                            (int(tup[2] / tup[0]), int(tup[3] / tup[1])))))
+
     def update(self):
-        if self.right:
-            self.image = self.images[0]
-        else:
-            self.image = self.images[1]
+        image = self.images[(abs(self.timer // (500 // 4)) - 1) % 4]
+        self.image = image if self.right else pygame.transform.flip(image, True, False)
 
 
 def game_over():
