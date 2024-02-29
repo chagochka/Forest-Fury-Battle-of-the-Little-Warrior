@@ -1,3 +1,4 @@
+import csv
 import random
 
 import pygame
@@ -7,6 +8,7 @@ from item import *
 from UI import UI
 from SkillTree import SkillTree
 import os
+from pygame import surface
 
 
 def load_image(name):
@@ -31,13 +33,14 @@ class Monster(pygame.sprite.Sprite):
 
     def __init__(self, speed=False, boss_type=None):
         super().__init__(group_sprites)
+        self.images = list()
         self.difficulty = ['low', 'medium', 'high', 'boss']
         self.monster_statistics = {
             'low': [20, (100, 150), 0.7, 64],  # атака, хп монстра
             'medium': [50, (150, 200), 0.5, 64],
             'high': [75, (200, 250), 0.3, 64],
             'boss': [100, (250, 500), 0.3, 64],
-            'boss_eye': [200, (2499, 2500), 0.25, 64]  # надо переделать под дальнюю атаку
+            'boss_eye': [200, (2499, 2500), 0.25, 64]
         }
         self.timer = 0
         self.scores = {
@@ -48,24 +51,31 @@ class Monster(pygame.sprite.Sprite):
             'boss_eye': 500
 
         }
-        self.monster_textures = {
-            'low': 'slither.gif',
+
+        """'low': 'slither.gif',
             'medium': 'spider.gif',
             'high': 'knight.gif',
             'boss': 'boss.gif',
-            'boss_eye': 'boss_eye.gif'
+            'boss_eye': 'boss_eye.gif',"""
+
+        self.monster_textures = {
+            'low': 'slither.png',
+            'medium': 'spider.png',
+            'high': 'knight.png',
+            'boss': 'boss.png',
+            'boss_eye': 'boss_eye.png'
         }
 
         self.x = random.randint(0, 1160)
         self.y = random.randint(0, 610)
 
-        if boss_type is None:  # супер боссы
+        if boss_type is None:  # супер босс
             self.diff = random.choices(self.difficulty, weights=[4, 3, 2, 1], k=1)[0]
         else:
             self.diff = boss_type
 
         self.image = load_image(self.monster_textures[self.diff])
-        self.images = [load_image(self.monster_textures[self.diff]), pygame.transform.flip(self.image, True, False)]
+        self.image_slicer()
         self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
 
         self.atk = self.monster_statistics[self.diff][0]
@@ -79,11 +89,31 @@ class Monster(pygame.sprite.Sprite):
         self.attack_range = self.monster_statistics[self.diff][3]
         self.texture = []
 
+    def image_slicer(self):
+        slices_info = {
+            'low': (3, 2, 384, 256),  # x, y, x, y
+            'medium': (3, 2, 768, 512),
+            'high': (2, 2, 256, 256),
+            'boss': (3, 2, 384, 256),
+            'boss_eye': (3, 3, 288, 288)
+        }
+        tup = slices_info[self.diff]  # размеры спрайта
+        for s1 in range(tup[1]):
+            for s2 in range(tup[0]):
+                image = load_image(
+                    self.monster_textures[self.diff]).subsurface(
+                    pygame.Rect((int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
+                                (int(tup[2] / tup[0]), int(tup[3] / tup[1]))))
+                if self.diff not in ('boss', 'boss_eye'):
+                    self.images.append(pygame.transform.scale(image, (128, 128)))
+                else:
+                    self.images.append(pygame.transform.scale(image, (256, 256)))
+
     def is_life(self):
         """
-		Проверка живой ли монстр, если нет то выпадает дроп
-		:return: bool
-		"""
+        Проверка живой ли монстр, если нет то выпадает дроп
+        :return: bool
+        """
         if self.hp <= 0:
             types = [Weapon, Armor]
             weights = [1, 3]
@@ -112,6 +142,7 @@ class Monster(pygame.sprite.Sprite):
                     Armor(pygame.image.load(f'images/{rar}_{armor_type}.gif'), rar, armor_type),
                     (self.x, self.y), cycle))
             player.score += self.scores[self.diff]
+            player.kill += 1
             tree.point(player.score)
             return False
         return True
@@ -134,23 +165,27 @@ class Monster(pygame.sprite.Sprite):
                     self.y += self.speed
                 else:
                     self.y -= self.speed
-        self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
+        self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def attack(self):
         """
         Атака по игроку (автоматически) + кд
         :return None
         """
-        if (player.attack_range(self.attack_range) or pygame.sprite.collide_mask(self, player)) \
-                and self.hp > 0 >= self.timer and not player.immortality:
+        if pygame.sprite.collide_mask(self, player) and self.hp > 0 >= self.timer and not player.immortality:
             player.damage_taken(self.atk)
             self.timer = 500
 
     def update(self):
-        if self.right:
-            self.image = self.images[0]
-        else:
-            self.image = self.images[1]
+        frames_count = {
+            'low': 6,
+            'medium': 6,
+            'high': 4,
+            'boss': 5,
+            'boss_eye': 9
+        }
+        image = self.images[(abs(self.timer // (500 // frames_count[self.diff])) - 1) % frames_count[self.diff]]
+        self.image = image if self.right else pygame.transform.flip(image, True, False)
         if not pygame.sprite.collide_mask(self, player):
             self.monster_move()
 
@@ -204,6 +239,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         super().__init__(group_sprites)
+        self.images = list()
         self.health = 500
         self.max_health = 500
         self.attack = 50
@@ -224,57 +260,71 @@ class Player(pygame.sprite.Sprite):
         }
         self.level = 0
 
-        self.image = load_image('ninja.gif')
-        self.images = [load_image('ninja.gif'), pygame.transform.flip(self.image, True, False)]
-        self.rect = pygame.Rect(self.x - 64, self.y - 64, 64, 64)
+        self.kill = 0
+        self.all_damage = 0
+        self.all_mob_damage = 0
+        self.all_hael = 0
+
+        self.image = load_image('player.png')
+        self.image_slicer()
+        self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
         self.mask = pygame.mask.from_surface(self.image)
 
     def damage_taken(self, damage):
         """
-		    Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
-		    :param damage: int
-		    :return: None
-		    """
+        Функция отнимает здоровье персонажа (броня блокирует процент урона максимум блокировки урона - 60% + пасивки)
+        :param damage: int
+        :return: None
+        """
         if not self.immortality:
             if tree.spell["Я есть грунт"]:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 5))
             elif tree.spell["Я терпила"] and self.health < 200:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]]) + 15))
             else:
-                self.health -= damage / 100 * (  # ?
+                coof = damage / 100 * (
                         100 - (sum([armor.stat for armor in list(self.inventory.values())[1:-1]])))
+            self.health -= coof
+            self.all_mob_damage += coof
             if tree.spell["Просвящённый"]:
                 monsters.hp -= damage * 0.5
+                self.all_damage += damage * 0.5
                 self.health += damage * 0.2
+                self.all_hael += damage * 0.2
             if tree.spell["Сила майнкрфта"]:
                 monsters.hp -= damage * 0.3
+                self.all_damage += damage * 0.3
 
     def damage_given(self):  # Нанесение урона мобу
         """
-		Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
-		:return: None
-		"""
+        Отнимает здоровье у монстра (начальный урон + дополнительный урон от меча + умения)
+        :return: None
+        """
         if monsters.hp > 0 >= player.timer and self.health >= 0:
             if self.attack_range():
-                if not self.immortality:
-                    coof2 = 0
-                    coof1 = 1
-                    if tree.spell["Вдохновляющий стяг"]:
-                        coof1 = 1.1
-                    elif tree.spell["Светик-Сто-Смертник"]:
-                        coof2 = 50
-                    monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
-                else:
-                    monsters.hp -= 500
+                coof2 = 0
+                coof1 = 1
+                if tree.spell["Вдохновляющий стяг"]:
+                    coof1 = 1.1
+                elif tree.spell["Светик-Сто-Смертник"]:
+                    coof2 = 50
+                elif self.immortality:
+                    coof2 = 500
+                monsters.hp -= coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
+                self.all_damage += coof1 * (coof2 + self.attack + self.inventory['sword'].stat)
+                if tree.spell["Кровосися"]:
+                    self.health += (coof1 * (coof2 + self.attack + self.inventory['sword'].stat)) * 0.05
                 if monsters.hp < monsters.max_hp // 10 and tree.spell["Лечь костями"]:
                     monsters.hp -= monsters.hp
+                    self.all_damage += monsters.hp
                 monsters.is_life()
                 if tree.spell["КДАБР"]:
                     player.timer = 220
                 else:
                     player.timer = 300
+                self.health_max_more()
                 pygame.mixer.music.load(random.choice(hits))
             else:
                 pygame.mixer.music.load(random.choice(misses))
@@ -288,6 +338,7 @@ class Player(pygame.sprite.Sprite):
         if self.health > self.max_health:
             if tree.spell["Абаддон"]:
                 monsters.hp -= self.health - self.max_health
+                self.all_damage += self.health - self.max_health
             self.health = self.max_health
 
     def attack_range(self, attack_range=128):  # радиус атаки
@@ -309,8 +360,8 @@ class Player(pygame.sprite.Sprite):
         if self.x - coof >= 0 and self.health > 0:
             self.x -= coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
-            self.rect = self.rect.move(-coof, 0)
+                self.health += 0.01
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
             self.right = False
 
     def move_right(self):  # Движение игрока по карте
@@ -322,8 +373,8 @@ class Player(pygame.sprite.Sprite):
         if self.x + coof <= 1160 and self.health > 0:
             self.x += coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
-            self.rect = self.rect.move(coof, 0)
+                self.health += 0.01
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
             self.right = True
 
     def move_down(self):  # Движение игрока по карте
@@ -335,8 +386,8 @@ class Player(pygame.sprite.Sprite):
         if self.y + coof <= 610 and self.health > 0:
             self.y += coof
             if tree.spell["Сапоги Гермеса"]:
-                self.health += 0.015
-            self.rect = self.rect.move(0, coof)
+                self.health += 0.01
+            self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def move_up(self):  # Движение игрока по карте
         """
@@ -348,8 +399,8 @@ class Player(pygame.sprite.Sprite):
             if self.y - coof >= 0:
                 self.y -= coof
                 if tree.spell["Сапоги Гермеса"]:
-                    self.health += 0.015
-                self.rect = self.rect.move(0, -coof)
+                    self.health += 0.01
+                self.rect = pygame.Rect(self.x - 64, self.y - 64, 128, 128)
 
     def find_item(self, x, y):
         """
@@ -361,11 +412,19 @@ class Player(pygame.sprite.Sprite):
         """
         return -64 <= self.x - x <= 64 and -64 <= self.y - y <= 64
 
+    def image_slicer(self):
+        tup = (2, 2, 256, 256)  # размеры спрайта
+        for s1 in range(tup[1]):
+            for s2 in range(tup[0]):
+                self.images.append(
+                    load_image('player.png').subsurface(
+                        pygame.Rect(
+                            (int(tup[2] / tup[0] * s2), int(tup[3] / tup[1] * s1)),
+                            (int(tup[2] / tup[0]), int(tup[3] / tup[1])))))
+
     def update(self):
-        if self.right:
-            self.image = self.images[0]
-        else:
-            self.image = self.images[1]
+        image = self.images[(abs(self.timer // (500 // 4)) - 1) % 4]
+        self.image = image if self.right else pygame.transform.flip(image, True, False)
 
 
 def game_over():
@@ -385,6 +444,138 @@ window = pygame.display.set_mode((width, height))
 pygame.display.set_caption('fight!')
 
 font = pygame.font.Font('font/joystix.ttf', 18)
+buttons_dict = {
+    'a': pygame.K_a,
+    'b': pygame.K_b,
+    'c': pygame.K_c,
+    'd': pygame.K_d,
+    'e': pygame.K_e,
+    'f': pygame.K_f,
+    'g': pygame.K_g,
+    'h': pygame.K_h,
+    'i': pygame.K_i,
+    'j': pygame.K_j,
+    'k': pygame.K_k,
+    'l': pygame.K_l,
+    'm': pygame.K_m,
+    'n': pygame.K_n,
+    'o': pygame.K_o,
+    'p': pygame.K_p,
+    'q': pygame.K_q,
+    'r': pygame.K_r,
+    's': pygame.K_s,
+    't': pygame.K_t,
+    'u': pygame.K_u,
+    'v': pygame.K_v,
+    'w': pygame.K_w,
+    'x': pygame.K_x,
+    'y': pygame.K_y,
+    'z': pygame.K_z,
+    'backspace': pygame.K_BACKSPACE,
+    'tab': pygame.K_TAB,
+    'clear': pygame.K_CLEAR,
+    'return': pygame.K_RETURN,
+    'pause': pygame.K_PAUSE,
+    'escape': pygame.K_ESCAPE,
+    'space': pygame.K_SPACE,
+    'exclaim': pygame.K_EXCLAIM,
+    'quotedbl': pygame.K_QUOTEDBL,
+    'hash': pygame.K_HASH,
+    'dollar': pygame.K_DOLLAR,
+    'ampersand': pygame.K_AMPERSAND,
+    'quote': pygame.K_QUOTE,
+    'leftparen': pygame.K_LEFTPAREN,
+    'rightparen': pygame.K_RIGHTPAREN,
+    'asterisk': pygame.K_ASTERISK,
+    'plus': pygame.K_PLUS,
+    'comma': pygame.K_COMMA,
+    'minus': pygame.K_MINUS,
+    'period': pygame.K_PERIOD,
+    'slash': pygame.K_SLASH,
+    'num0': pygame.K_0,
+    'num1': pygame.K_1,
+    'num2': pygame.K_2,
+    'num3': pygame.K_3,
+    'num4': pygame.K_4,
+    'num5': pygame.K_5,
+    'num6': pygame.K_6,
+    'num7': pygame.K_7,
+    'num8': pygame.K_8,
+    'num9': pygame.K_9,
+    'colon': pygame.K_COLON,
+    'semicolon': pygame.K_SEMICOLON,
+    'less': pygame.K_LESS,
+    'equals': pygame.K_EQUALS,
+    'greater': pygame.K_GREATER,
+    'question': pygame.K_QUESTION,
+    'at': pygame.K_AT,
+    'leftbracket': pygame.K_LEFTBRACKET,
+    'backslash': pygame.K_BACKSLASH,
+    'rightbracket': pygame.K_RIGHTBRACKET,
+    'caret': pygame.K_CARET,
+    'underscore': pygame.K_UNDERSCORE,
+    'backquote': pygame.K_BACKQUOTE,
+    'delete': pygame.K_DELETE,
+    'keypad0': pygame.K_KP0,
+    'keypad1': pygame.K_KP1,
+    'keypad2': pygame.K_KP2,
+    'keypad3': pygame.K_KP3,
+    'keypad4': pygame.K_KP4,
+    'keypad5': pygame.K_KP5,
+    'keypad6': pygame.K_KP6,
+    'keypad7': pygame.K_KP7,
+    'keypad8': pygame.K_KP8,
+    'keypad9': pygame.K_KP9,
+    'keypad_period': pygame.K_KP_PERIOD,
+    'keypad_divide': pygame.K_KP_DIVIDE,
+    'keypad_multiply': pygame.K_KP_MULTIPLY,
+    'keypad_minus': pygame.K_KP_MINUS,
+    'keypad_plus': pygame.K_KP_PLUS,
+    'keypad_enter': pygame.K_KP_ENTER,
+    'keypad_equals': pygame.K_KP_EQUALS,
+    'up': pygame.K_UP,
+    'down': pygame.K_DOWN,
+    'right': pygame.K_RIGHT,
+    'left': pygame.K_LEFT,
+    'insert': pygame.K_INSERT,
+    'home': pygame.K_HOME,
+    'end': pygame.K_END,
+    'pageup': pygame.K_PAGEUP,
+    'pagedown': pygame.K_PAGEDOWN,
+    'f1': pygame.K_F1,
+    'f2': pygame.K_F2,
+    'f3': pygame.K_F3,
+    'f4': pygame.K_F4,
+    'f5': pygame.K_F5,
+    'f6': pygame.K_F6,
+    'f7': pygame.K_F7,
+    'f8': pygame.K_F8,
+    'f9': pygame.K_F9,
+    'f10': pygame.K_F10,
+    'f11': pygame.K_F11,
+    'f12': pygame.K_F12,
+    'f13': pygame.K_F13,
+    'f14': pygame.K_F14,
+    'f15': pygame.K_F15,
+    'numlock': pygame.K_NUMLOCK,
+    'capslock': pygame.K_CAPSLOCK,
+    'scrolllock': pygame.K_SCROLLOCK,
+    'rshift': pygame.K_RSHIFT,
+    'lshift': pygame.K_LSHIFT,
+    'rctrl': pygame.K_RCTRL,
+    'lctrl': pygame.K_LCTRL,
+    'ralt': pygame.K_RALT,
+    'lalt': pygame.K_LALT,
+    'rmeta': pygame.K_RMETA,
+    'lmeta': pygame.K_LMETA,
+    'lsuper': pygame.K_LSUPER,
+    'rsuper': pygame.K_RSUPER,
+    'mode': pygame.K_MODE,
+    'help': pygame.K_HELP,
+    'print': pygame.K_PRINT,
+    'sysreq': pygame.K_SYSREQ,
+    'break': pygame.K_BREAK
+}
 
 menu_theme = pygame.mixer.Sound('sounds/Mind Flayer Theme.wav')
 fight_theme = pygame.mixer.Sound('sounds/Nine Blades.wav')
@@ -402,6 +593,7 @@ ui = UI(window, font, player)
 
 stop = "menu"
 inGame = False
+in_settings = False
 items = []
 run = True
 cycle = 0
@@ -409,10 +601,14 @@ cycle = 0
 tree = SkillTree(player, window, font)
 
 while run:
+    with open('binds.csv', encoding="utf8") as csvfile:
+        binds = list(csv.reader(csvfile, delimiter=';', quotechar='"'))
+        binds = dict(zip(binds[0], binds[1]))
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if inGame and event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+        if inGame and event.type == pygame.KEYDOWN and event.key == buttons_dict[binds['use_potion']]:
             if player.inventory['potion']:
                 player.inventory['potion'].pop().heal(player)
 
@@ -427,13 +623,13 @@ while run:
         menu_theme.stop()
         fight_theme.set_volume(0.01)
         fight_theme.play()
-        if key[pygame.K_d] and player.x < 1160:  # движение героя
+        if key[buttons_dict[binds['move_right']]] and player.x < 1160:  # движение героя
             player.move_right()
-        if key[pygame.K_s] and player.y < 610:
+        if key[buttons_dict[binds['move_back']]] and player.y < 610:
             player.move_down()
-        if key[pygame.K_a] and player.x >= 64:
+        if key[buttons_dict[binds['move_left']]] and player.x >= 64:
             player.move_left()
-        if key[pygame.K_w] and player.y >= 64:
+        if key[buttons_dict[binds['move_forward']]] and player.y >= 64:
             player.move_up()
         if key[pygame.K_e] or mouse[0]:
             player.damage_given()
@@ -506,7 +702,26 @@ while run:
         if player.health <= 0:
             game_over()
 
+        cycle += 1
         clock.tick(300)
+    elif in_settings:
+        fight_theme.stop()
+        skills_theme.stop()
+        menu_theme.play()
+
+        cords = ui.open_settings_window()
+
+        for cord in cords:
+            if cord[2] >= pygame.mouse.get_pos()[0] >= cord[0] and cord[3] >= pygame.mouse.get_pos()[1] >= cord[1]:
+                pygame.draw.rect(window, '#FFCB30', (cord[0], cord[1], 40, 50))
+                for let_char, pg_char in buttons_dict.items():
+                    if key[pg_char]:
+                        ui.change_bind(cord[-1], let_char)
+
+        if key[pygame.K_ESCAPE]:
+            in_settings = False
+
+        ui.set_cursor()
     else:
         if stop == "menu":
             fight_theme.stop()
@@ -518,22 +733,27 @@ while run:
                     300 >= pygame.mouse.get_pos()[1] >= 240:
                 inGame = True
             if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
+                    390 >= pygame.mouse.get_pos()[1] >= 320:
+                in_settings = True
+            if pygame.mouse.get_pressed()[0] and 760 >= pygame.mouse.get_pos()[0] >= 510 and \
                     480 >= pygame.mouse.get_pos()[1] >= 400:
                 break
         elif stop == "level":
             fight_theme.stop()
             menu_theme.stop()
             skills_theme.play()
-            skilltree = pygame.image.load('images/skilltree.png')
+            skilltree = pygame.image.load('images/skill_tree.jpg')
             window.blit(skilltree, (0, 0))
 
-            if pygame.mouse.get_pressed()[0] and 810 >= pygame.mouse.get_pos()[0] >= 670 and \
-                    450 >= pygame.mouse.get_pos()[1] >= 400:
+            if pygame.mouse.get_pressed()[0] and 215 >= pygame.mouse.get_pos()[0] >= 55 and \
+                    490 >= pygame.mouse.get_pos()[1] >= 440:
                 inGame = True
-            tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
-                                 pygame.mouse.get_pressed()[0])
+            tree.go()
+            if pygame.mouse.get_pressed()[0]:
+                tree.cursor_location((pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]),
+                                     pygame.mouse.get_pressed()[0])
+                pygame.time.delay(100)
         ui.set_cursor()
-    cycle += 1
     pygame.display.update()
 
 pygame.quit()
